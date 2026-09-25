@@ -12,7 +12,15 @@
       "include": "^(fragrance/(?!.*gift-sets)|pocket-perfume/|vial/)",
       "dailyBudget": 1200,
       "maxAgeDays": 21,
-      "rps": 1
+      "rps": 1,
+      "priority": [
+        "^fragrance/(men|women)",
+        "^fragrance/unisex$",
+        "testers",
+        "^fragrance/niche",
+        "^pocket-perfume",
+        "^vial"
+      ]
     },
     {
       "id": "perfumania",

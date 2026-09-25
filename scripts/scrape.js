@@ -31,28 +31,28 @@ function makeThrottle(rps) {
 }
 const shopifyThrottle = makeThrottle(MAX_RPS);
 
+// Returns the response body as text (null for 404s etc.). The body is read inside the retry loop:
+// a big page read slowly under load can time out after the headers have arrived.
 async function fetchWithRetry(url, throttle, accept, tries = 6) {
   for (let i = 1; ; i++) {
     await throttle();
-    let res;
     try {
-      res = await fetch(url, { headers: { 'user-agent': UA, accept }, signal: AbortSignal.timeout(30000) });
+      const res = await fetch(url, { headers: { 'user-agent': UA, accept }, signal: AbortSignal.timeout(90000) });
+      if (res.status === 429 || res.status >= 500) {
+        if (i >= tries) throw new Error(`HTTP ${res.status}`);
+        const wait = (+res.headers.get('retry-after') || 15 * 2 ** (i - 1)) * 1000;
+        console.log(`  ${new URL(url).host}: HTTP ${res.status}, pausing ${Math.round(wait / 1000)}s`);
+        throttle.backOff(wait);
+        continue;
+      }
+      return res.ok ? await res.text() : null;
     } catch (e) {
-      if (i >= tries) throw e;
+      if (i >= tries || /^HTTP/.test(e.message)) throw e;
       await sleep(5000 * i);
-      continue;
     }
-    if (res.status === 429 || res.status >= 500) {
-      if (i >= tries) throw new Error(`HTTP ${res.status}`);
-      const wait = (+res.headers.get('retry-after') || 15 * 2 ** (i - 1)) * 1000;
-      console.log(`  ${new URL(url).host}: HTTP ${res.status}, pausing ${Math.round(wait / 1000)}s`);
-      throttle.backOff(wait);
-      continue;
-    }
-    return res.ok ? res : null;
   }
 }
-const getJson = async (url) => (await fetchWithRetry(url, shopifyThrottle, 'application/json'))?.json() ?? null;
+const getJson = async (url) => { const t = await fetchWithRetry(url, shopifyThrottle, 'application/json'); return t ? JSON.parse(t) : null; };
 
 async function* shopifyProducts(base) {
   for (let page = 1; page <= MAX_PAGES; page++) {
@@ -121,24 +121,25 @@ function ldProduct(html) {
   return null;
 }
 
-function offerFromLd(src, page, knownBrands) {
+function offerFromLd(src, page, knownBrands, skipped) {
   const { ld, url, category } = page;
+  const skip = (why) => { skipped[why] = (skipped[why] || 0) + 1; return null; };
   const offer = Array.isArray(ld.offers) ? ld.offers[0] : ld.offers;
   const price = +offer?.price;
-  if (!(price > 0) || !/InStock/i.test(offer?.availability || '')) return null;
-  if ((offer.priceCurrency || 'USD') !== 'USD') return null;
+  if (!(price > 0) || !/InStock/i.test(offer?.availability || '')) return skip('out of stock');
+  if ((offer.priceCurrency || 'USD') !== 'USD') return skip('not USD');
   const desc = String(ld.description || '');
-  if (isNotPerfume(`${ld.name} ${desc}`)) return null;
-  const vendor = (typeof ld.brand === 'object' ? ld.brand?.name : ld.brand) || brandFromTitle(ld.name, knownBrands);
+  if (isNotPerfume(`${ld.name} ${desc}`)) return skip('not perfume');
+  const vendor = (typeof ld.brand === 'object' ? ld.brand?.name : ld.brand) || page.pageBrand || brandFromTitle(ld.name, knownBrands);
   const brand = canonicalBrand(vendor);
-  if (!brand) return null;
+  if (!brand) return skip('unknown brand');
   const name = fragranceName(ld.name, brand, vendor);
   const ml = sizeMl(desc) ?? sizeMl(ld.name);
-  if (!name || !ml) return null;
+  if (!name || !ml) return skip('no name/size');
   const conc = concentration(desc) || concentration(ld.name);
   return {
     id: perfumeId(brand, name, conc), brand, name, conc,
-    src: src.id, kind: /^vial\//.test(category) ? 'decant' : 'bottle', ml, price,
+    src: src.id, kind: /^(vial|pocket-perfume)\//.test(category) ? 'decant' : 'bottle', ml, price,
     tester: /tester/i.test(category) || isTester(`${ld.name} ${desc}`) || undefined,
     url, seen: today,
   };
@@ -146,34 +147,41 @@ function offerFromLd(src, page, knownBrands) {
 
 const ADAPTERS = {
   async jsonld(src) {
-    const res = await fetchWithRetry(src.sitemap, src.throttle, 'application/xml');
-    if (!res) throw new Error('sitemap unavailable');
+    const sitemap = await fetchWithRetry(src.sitemap, src.throttle, 'application/xml');
+    if (!sitemap) throw new Error('sitemap unavailable');
     const include = new RegExp(src.include);
     const byKey = new Map(); // one URL per product id (the same product is listed under several categories)
-    for (const [, url] of (await res.text()).matchAll(/<loc>([^<]+)<\/loc>/g)) {
+    for (const [, url] of sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)) {
       const key = url.match(new RegExp(src.idPattern))?.[1];
       const category = new URL(url).pathname.split('/').slice(1, 3).join('/');
       if (key && include.test(category) && !byKey.has(key)) byKey.set(key, { url, category });
     }
     const checked = jsonldState[src.id] ||= {};
     const budget = +(process.env.JSONLD_BUDGET || src.dailyBudget);
-    const due = [...byKey.keys()].sort((a, b) => (checked[a] ?? -1) - (checked[b] ?? -1)).slice(0, budget);
+    // Oldest-checked first; among never-checked pages, the order of `priority` patterns wins.
+    const rank = (k) => { const i = (src.priority || []).findIndex((re) => new RegExp(re).test(byKey.get(k).category)); return i < 0 ? 99 : i; };
+    const due = [...byKey.keys()]
+      .sort((a, b) => (checked[a] ?? -1) - (checked[b] ?? -1) || rank(a) - rank(b))
+      .slice(0, budget);
     const pages = [];
     for (const key of due) {
-      const r = await fetchWithRetry(byKey.get(key).url, src.throttle, 'text/html').catch(() => null);
+      const html = await fetchWithRetry(byKey.get(key).url, src.throttle, 'text/html').catch(() => null);
       checked[key] = dayNum(today);
-      const ld = r && ldProduct(await r.text());
-      if (ld) pages.push({ key, ld, ...byKey.get(key), url: ld.url || byKey.get(key).url });
+      const ld = html && ldProduct(html);
+      // The house is in the page's spec table even when the JSON-LD omits it.
+      const pageBrand = html?.match(/aria-label="Brand: ([^"]+)"/)?.[1];
+      if (ld) pages.push({ key, ld, pageBrand, ...byKey.get(key), url: ld.url || byKey.get(key).url });
     }
     const fresh = new Set(due);
     const keyOf = (url) => url.match(new RegExp(src.idPattern))?.[1];
     const carried = previousAll.filter((o) => o.src === src.id && !fresh.has(keyOf(o.url)) && byKey.has(keyOf(o.url)) &&
       dayNum(today) - dayNum(o.seen) <= src.maxAgeDays);
     const coverage = Object.keys(checked).filter((k) => byKey.has(k)).length;
+    const skipped = {};
     return {
       offers: [], scanned: pages.length, deferred: true,
-      summary: `${due.length} pages checked today, ${coverage}/${byKey.size} checked within the cycle, ${carried.length} offers carried forward`,
-      resolve: (knownBrands) => [...pages.map((p) => offerFromLd(src, p, knownBrands)).filter(Boolean), ...carried],
+      resolve: (knownBrands) => [...pages.map((p) => offerFromLd(src, p, knownBrands, skipped)).filter(Boolean), ...carried],
+      summarize: () => `${due.length} pages checked today, ${coverage}/${byKey.size} checked this cycle, ${carried.length} offers carried forward; skipped ${JSON.stringify(skipped)}`,
     };
   },
 
@@ -191,7 +199,6 @@ const ADAPTERS = {
     return {
       offers: [], scanned: n, deferred: true,
       resolve: (knownBrands) => products.flatMap((p) => offersFromShopify(src, p, knownBrands)),
-      summary: null,
     };
   },
 };
@@ -236,7 +243,7 @@ for (const r of results) for (const o of r.offers) knownBrands.set(words(o.brand
 for (const r of results) {
   if (!r.resolve) continue;
   r.offers = r.resolve(knownBrands);
-  console.log(`${r.src.id}: ${r.scanned} products -> ${r.offers.length} offers${r.summary ? ` (${r.summary})` : ''}`);
+  console.log(`${r.src.id}: ${r.scanned} products -> ${r.offers.length} offers${r.summarize ? ` (${r.summarize()})` : ''}`);
 }
 
 const offers = results.flatMap((r) => r.offers);
