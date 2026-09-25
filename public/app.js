@@ -2,8 +2,9 @@ const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const money = (n) => `$${n.toFixed(2)}`;
 const ascii = (s) => s.normalize('NFKD').replace(/[̀-ͯ]/g, '');
-const slug = (s) => ascii(s).toLowerCase().replace(/&/g, ' ').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-const words = (s) => ascii(s).toLowerCase().replace(/&/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
+// Must match scripts/lib/normalize.js, since ids are recomputed here from the index rows.
+const slug = (s) => ascii(s).toLowerCase().replace(/['’]/g, '').replace(/&/g, ' ').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const words = (s) => ascii(s).toLowerCase().replace(/['’]/g, '').replace(/&/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
 const dayToDate = (d) => new Date(d * 86400000).toISOString().slice(0, 10);
 const CONC = { EDP: 'Eau de Parfum', EDT: 'Eau de Toilette', EDC: 'Eau de Cologne', Parfum: 'Parfum', Extrait: 'Extrait de Parfum' };
 const ALIASES = { ysl: 'yves saint laurent', mfk: 'maison francis kurkdjian', pdm: 'parfums de marly', jpg: 'jean paul gaultier', 'd g': 'dolce gabbana', ck: 'calvin klein' };

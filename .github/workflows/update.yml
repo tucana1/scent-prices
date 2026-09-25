@@ -41,6 +41,13 @@ jobs:
         run: |
           node -e "const i=require('./public/data/index.json');console.log('fragrances',i.rows.length)" >> $GITHUB_STEP_SUMMARY
           grep -E 'offers|FAILED|skipped' scrape.log >> $GITHUB_STEP_SUMMARY || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scrape-${{ github.run_id }}
+          path: |
+            build/offers.json
+            scrape.log
+          retention-days: 7
       - name: Commit price history
         if: github.event_name == 'schedule' || inputs.deploy
         run: |

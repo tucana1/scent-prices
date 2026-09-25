@@ -85,9 +85,11 @@ function offersFromShopify(src, p, knownBrands) {
     // Decant shops: anything in the original bottle is a full bottle, the rest is a decant.
     const inOriginalBottle = /manufacturer|original bottle|full bottle|retail bottle/i.test(`${p.title} ${vt}`);
     const kind = src.kind === 'decant' && ml <= 35 && !(inOriginalBottle && ml > 15) ? 'decant' : 'bottle';
+    // A product can list EDT and EDP as variants, so the variant's own label wins.
+    const conc = concentration(vt) || concentration(productText);
     out.push({
-      id: perfumeId(brand, name, concentration(all)),
-      brand, name, conc: concentration(all),
+      id: perfumeId(brand, name, conc),
+      brand, name, conc,
       src: src.id, kind, ml, price,
       tester: isTester(all) || undefined,
       note,

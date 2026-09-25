@@ -39,12 +39,13 @@ export function ascii(s) {
   return String(s || '').normalize('NFKD').replace(/[̀-ͯ]/g, '');
 }
 
+// Apostrophes are dropped, not spaced: "Penhaligon's" and "Penhaligons" must be the same brand.
 export function slug(s) {
-  return ascii(s).toLowerCase().replace(/&/g, ' ').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  return ascii(s).toLowerCase().replace(/['’]/g, '').replace(/&/g, ' ').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
 export function words(s) {
-  return ascii(s).toLowerCase().replace(/&/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
+  return ascii(s).toLowerCase().replace(/['’]/g, '').replace(/&/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
 }
 
 export function canonicalBrand(vendor) {
@@ -89,7 +90,8 @@ export function isNotPerfume(text) {
 
 // Strip brand, concentration, size and marketing filler from a title, leaving the fragrance name.
 export function fragranceName(title, brand, vendor) {
-  let t = ' ' + words(title) + ' ';
+  // Parentheticals are packaging/edition chatter: "(Unisex)", "(Sample)", "(DISCONTINUED)", "(Tester)".
+  let t = ' ' + words(String(title).replace(/\([^)]*\)/g, ' ')) + ' ';
   const brandForms = new Set([words(brand), words(vendor), words(vendor).replace(BRAND_SUFFIX, '')]);
   for (const [alias, canon] of Object.entries(BRAND_ALIASES)) if (canon === brand) brandForms.add(alias);
   // Longest first so "christian dior" goes before "dior".
@@ -99,7 +101,7 @@ export function fragranceName(title, brand, vendor) {
   t = t
     .replace(/\b\d*\.?\d+\s*(ml|oz|fl oz|fl)\b/g, ' ')
     .replace(/\b(extrait de parfum|eau de parfum|eau de toilette|eau de cologne|eau fraiche|edp|edt|edc|extrait|parfum intense|parfum)\b/g, (m) => (m === 'parfum intense' ? 'intense' : ' '))
-    .replace(/\b(spray|splash|vaporisateur|natural|perfumes?|colognes?|fragrances?|scent|tester|unboxed|new|box item|in box|samples?|decants?|split|retail bottle|travel spray|travel size|manufacturer boxed|boxed|glass sample vial|sample vial|glass spray|vial|mini|\d{4} s batch|\d{4} batch|for (men|women|him|her|unisex)|men s|women s|mens|womens|unisex|men|women|by)\b/g, ' ')
+    .replace(/\b(spray|splash|vaporisateur|natural|perfumes?|colognes?|fragrances?|scent|tester|unboxed|new|box item|in box|samples?|decants?|split|retail bottle|travel spray|travel size|manufacturer boxed|boxed|glass sample vial|sample vial|glass spray|vial|mini|\d{4}s batch|\d{4} batch|boxed|for (men|women|man|woman|him|her|unisex)|mens|womens|unisex|men|women|man|woman|by)\b/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
   return t;
