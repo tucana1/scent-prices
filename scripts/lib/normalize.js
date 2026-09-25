@@ -105,7 +105,7 @@ export function fragranceName(title, brand, vendor) {
     .replace(/\b\d*\.?\d+\s*(ml|oz|fl oz|fl)\b/g, ' ')
     // "Le Parfum" / "Elixir de Parfum" style names keep the word; plain "Parfum" is concentration.
     .replace(/\b(extrait de parfum|eau de parfum|eau de toilette|eau de cologne|eau fraiche|edp|edt|edc|extrait|parfum intense|(?<!\ble )parfum)\b/g, (m) => (m === 'parfum intense' ? 'intense' : ' '))
-    .replace(/\b(spray|splash|vaporisateur|natural|perfumes?|colognes?|fragrances?|scent|tester|unboxed|new|box item|in box|samples?|decants?|split|retail bottle|travel spray|travel size|xl|private blend|private line|manufacturer boxed|boxed|glass sample vial|sample vial|glass spray|vial|mini|\d{4}s batch|\d{4} batch|boxed|for (men|women|man|woman|him|her|unisex)|mens|womens|unisex|men|women|man|woman|by)\b/g, ' ')
+    .replace(/\b(spray|splash|vaporisateur|natural|perfumes?|colognes?|fragrances?|scent|tester|unboxed|new|box item|in box|brand without box|without box|no box|samples?|decants?|split|retail bottle|travel spray|travel size|xl|private blend|private line|manufacturer boxed|boxed|glass sample vial|sample vial|glass spray|vial|mini|\d{4}s batch|\d{4} batch|boxed|for (men|women|man|woman|him|her|unisex)|mens|womens|unisex|men|women|man|woman|by)\b/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
   return t;

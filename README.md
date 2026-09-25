@@ -23,25 +23,53 @@ GitHub Actions (daily, free)                     GitHub Pages (free, static)
 
 ## Sources
 
-The site only reads stores that publish a structured product feed (Shopify's `/products.json`), so there's no HTML scraping and no bot-protection workarounds.
+The site only reads stores that publish a structured product feed (Shopify's `/products.json`), so there's no HTML scraping and no bot-protection workarounds. Shopify rate-limits per IP across all its stores, so the scraper shares one budget (1 request/sec) across every store and pauses everything on a 429. A full crawl takes about 10 minutes on GitHub Actions. If a shop fails, its offers from the last run (up to 3 days old) are reused.
 
 | Store | Type |
 |---|---|
-| Perfumania | discounter |
-| Beauty Encounter | discounter |
-| Aura Fragrance | discounter |
-| The Perfume Box | discounter |
-| DecantX | decants |
-| ScentSplit | decants + full bottles |
+| [Perfumania](https://perfumania.com) | discounter |
+| [Beauty Encounter](https://www.beautyencounter.com) | discounter |
+| [Aura Fragrance](https://www.aurafragrance.com) | discounter |
+| [The Perfume Box](https://perfumebox.com) | discounter |
+| [The Perfume Shop USA](https://theperfumeshopusa.com) | discounter |
+| [FragFlex](https://fragflex.com) | discounter |
+| [Lattafa USA (official)](https://lattafa-usa.com) | discounter |
+| [Fragrance Nevaeh](https://fragrance-nevaeh.com) | discounter |
+| [Fragrance Wholesale](https://fragrancewholesale.com) | discounter |
+| [Luxury Perfume](https://luxuryperfume.com) | discounter |
+| [Perfumes LA](https://perfumes.la/en-us) | discounter |
+| [Sensa Beauty](https://sensabeauty.com) | discounter |
+| [Fragrancelord](https://fragrancelord.com) | bottles + samples |
+| [Scentrique](https://www.scentrique.us) | bottles + samples |
+| [DecantX](https://decantx.com) | decants |
+| [ScentSplit](https://www.scentsplit.com) | decants |
+| [Decants R Us](https://decantsrus.com) | decants |
+| [Fragrances Line](https://fragrancesline.com) | decants |
+| [MicroPerfumes](https://microperfumes.com) | decants |
+| [The Perfumed Court](https://theperfumedcourt.com) | decants |
+| [Vintage Decants](https://vintagedecants.com) | decants |
+| [Olena's Aroma Shop](https://olenasaromashop.com) | decants |
+| [Mystic Perfume](https://mysticperfume.com) | decants |
+| [Discovery Decants](https://discoverydecants.com) | decants |
+| [TryScents](https://tryscentsdecants.com) | decants |
+| [Dynasty Decants](https://www.dynastydecants.com) | decants |
+| [Decanted Clone](https://decantedclone.com) | decants |
+| [Parfum Exquis](https://parfumexquis.com) | decants |
+| [Sample Scents](https://samplescents.com) | decants |
+| [Decantalize](https://decantalize.com) | decants |
+| [Scent Decant](https://www.scentdecant.com) | decants |
+| [The Fragrance Sample Shop](https://thefragrancesampleshop.com) | decants |
 | Reddit posts (submitted) | decants + bottles, expire after 60 days |
 
 **Left out on purpose:**
-- **FragranceNet, FragranceX and Perfume.com** block automated requests (403).
-- **Jomashop and MaxAroma** need a crawler that visits every product page. That's possible, but slower and more fragile.
+- **FragranceNet, FragranceX, Perfume.com, FragranceBuy, Venba and FragranceShop.com** block automated requests (403).
+- **Jomashop** loads prices with JavaScript from a private API. **MaxAroma** puts structured prices on each product page, but only for one size, across about 30k pages of ~700 KB. That would need a rotating crawl of part of the catalog per day. It's the best next candidate.
+- **Fragrance Outlet** has the same catalog as Perfumania. **FragranceUSA** lists almost everything as out of stock. **Aromatick** and **Decant & Discover** sell their own clones, or don't name the original brand.
+- **Non-USD shops** (Petit Parfums, Eurodecants, Fragrant World, Niche Perfume Decants, Prive Perfumes) are left out until the site handles currencies.
 - **Amazon, Walmart and eBay** are marketplaces with a high risk of fakes.
 - **Chanel** doesn't sell through discounters, so its fragrances rarely appear.
 
-To add a store, add a line to `config/sources.json`. A new Shopify store needs no code. For any other platform, write a new adapter in `scripts/scrape.js`.
+To add a store, add a line to `config/sources.json`. A new Shopify store needs no code. Set `"brandFrom": "title"` if the shop's vendor field is the shop's own name. For any other platform, write a new adapter in `scripts/scrape.js`. To test changes without publishing, run **Actions → Update prices → Run workflow** with *Deploy* unticked (a dry run). The scraped data is saved as a downloadable artifact.
 
 ## Setup (about 10 minutes)
 

@@ -84,7 +84,12 @@ function offersFromShopify(src, p, knownBrands) {
     if (!ml || !(price > 0)) continue;
     // Decant shops: anything in the original bottle is a full bottle, the rest is a decant.
     const inOriginalBottle = /manufacturer|original bottle|full bottle|retail bottle/i.test(`${p.title} ${vt}`);
-    const kind = src.kind === 'decant' && ml <= 35 && !(inOriginalBottle && ml > 15) ? 'decant' : 'bottle';
+    // 'mixed' shops sell full bottles and samples: small sizes count as decants only when labelled so.
+    const labelledSample = /sample|decant|atomizer|vial|split/i.test(`${p.title} ${vt}`);
+    const kind =
+      (src.kind === 'decant' && ml <= 35 && !(inOriginalBottle && ml > 15)) ||
+      (src.kind === 'mixed' && (ml <= 15 || (ml <= 35 && labelledSample)))
+        ? 'decant' : 'bottle';
     // A product can list EDT and EDP as variants, so the variant's own label wins.
     const conc = concentration(vt) || concentration(productText);
     out.push({

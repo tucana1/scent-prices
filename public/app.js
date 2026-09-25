@@ -26,8 +26,10 @@ async function loadIndex() {
     return { id, brand, name, conc, minBottle, minBottleMl, minDecant, n, hay: ` ${words(`${brand} ${name} ${conc} ${CONC[conc] || ''}`)} `, brandW: words(brand) };
   });
   const age = Math.round((Date.now() - Date.parse(index.updated)) / 3600000);
-  const nShops = Object.values(index.sources).filter((s) => s.kind !== 'reddit').length;
-  $('#meta').textContent = `${items.length.toLocaleString()} fragrances · ${nShops} shops + Reddit · updated ${age < 1 ? 'just now' : `${age}h ago`}`;
+  const shops = Object.values(index.sources);
+  const nDisc = shops.filter((s) => s.kind === 'discount').length;
+  const nDecant = shops.filter((s) => s.kind === 'decant' || s.kind === 'mixed').length;
+  $('#meta').textContent = `${items.length.toLocaleString()} fragrances · ${nDisc} discounters · ${nDecant} decant shops + Reddit · updated ${age < 1 ? 'just now' : `${age}h ago`}`;
 }
 
 function search(q) {

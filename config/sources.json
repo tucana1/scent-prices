@@ -1,5 +1,5 @@
 {
-  "_comment": "Only stores with a public, structured product feed. kind: 'discount' = full-bottle discounter, 'decant' = decant/sample shop. Shopify stores expose /products.json. brandFrom 'title' = the shop's vendor field is the shop itself, so the house is read from the product title.",
+  "_comment": "Only stores with a public, structured product feed. kind: 'discount' = full-bottle discounter, 'decant' = decant/sample shop, 'mixed' = sells both (small sizes count as decants only when labelled as samples). Shopify stores expose /products.json. brandFrom 'title' = the shop's vendor field is the shop itself, so the house is read from the product title.",
   "sources": [
     {
       "id": "perfumania",
@@ -44,13 +44,6 @@
       "base": "https://fragflex.com"
     },
     {
-      "id": "fragranceusa",
-      "name": "FragranceUSA",
-      "kind": "discount",
-      "adapter": "shopify",
-      "base": "https://www.fragranceusa.com"
-    },
-    {
       "id": "lattafausa",
       "name": "Lattafa USA (official)",
       "kind": "discount",
@@ -78,6 +71,34 @@
       "adapter": "shopify",
       "base": "https://luxuryperfume.com",
       "brandFrom": "title"
+    },
+    {
+      "id": "perfumesla",
+      "name": "Perfumes LA",
+      "kind": "discount",
+      "adapter": "shopify",
+      "base": "https://perfumes.la/en-us"
+    },
+    {
+      "id": "sensa",
+      "name": "Sensa Beauty",
+      "kind": "discount",
+      "adapter": "shopify",
+      "base": "https://sensabeauty.com"
+    },
+    {
+      "id": "fragrancelord",
+      "name": "Fragrancelord",
+      "kind": "mixed",
+      "adapter": "shopify",
+      "base": "https://fragrancelord.com"
+    },
+    {
+      "id": "scentrique",
+      "name": "Scentrique",
+      "kind": "mixed",
+      "adapter": "shopify",
+      "base": "https://www.scentrique.us"
     },
     {
       "id": "decantx",
@@ -200,6 +221,13 @@
       "adapter": "shopify",
       "base": "https://www.scentdecant.com",
       "brandFrom": "title"
+    },
+    {
+      "id": "samplesshop",
+      "name": "The Fragrance Sample Shop",
+      "kind": "decant",
+      "adapter": "shopify",
+      "base": "https://thefragrancesampleshop.com"
     }
   ]
 }
