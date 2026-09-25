@@ -156,6 +156,13 @@
       "maxAgeDays": 10
     },
     {
+      "id": "aromatick",
+      "name": "Aromatick",
+      "kind": "mixed",
+      "adapter": "shopify",
+      "base": "https://aromatick.com"
+    },
+    {
       "id": "decantx",
       "name": "DecantX",
       "kind": "decant",

@@ -79,7 +79,7 @@ Most shops are read from Shopify's public `/products.json` feed. Shops that aren
 **Rotating crawls.** Some sources have one page per product: **MaxAroma** (schema.org data), **Venba** (Shopify's per-product `.js` data; its bulk feed is blocked), **Luckyscent** (schema.org variants), **Surrender to Chance** (BigCommerce) and **Decant House** (nopCommerce). For the last two, only the default size's price is in the page. Their other sizes come from a cart endpoint that robots.txt disallows, so the site doesn't read them.
 
 **MaxAroma** isn't on Shopify. Its product pages carry schema.org price data, one size per page, across about 18k fragrance pages. The `jsonld` adapter checks 1,200 of those pages a day, oldest first, so the whole catalog refreshes about every 15 days. Offers are carried forward for up to 21 days, and the site shows "price as of <date>" on anything older than 2 days. A product is skipped if its brand doesn't appear at any other shop, which is safer than guessing.
-- **Fragrance Outlet** has the same catalog as Perfumania. **FragranceUSA** lists almost everything as out of stock. **Aromatick** and **Decant & Discover** sell their own clones, or don't name the original brand.
+- **Fragrance Outlet** has the same catalog as Perfumania. **FragranceUSA** lists almost everything as out of stock. **Decant & Discover** doesn't name the original brand.
 - **Non-USD shops** (Petit Parfums, Eurodecants, Fragrant World, Niche Perfume Decants, Prive Perfumes) are left out until the site handles currencies.
 - **Amazon, Walmart and eBay** are marketplaces with a high risk of fakes.
 - **Chanel** doesn't sell through discounters, so its fragrances rarely appear.

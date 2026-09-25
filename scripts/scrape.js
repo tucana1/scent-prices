@@ -167,8 +167,9 @@ const PAGE_PARSERS = {
     const checked = html.match(/<input[^>]*type="radio"[^>]*\bchecked\b[\s\S]*?form-option-variant">([^<]+)/)?.[1];
     const price = +(html.match(/"price":\{"without_tax":\{"formatted":"[^"]*","value":([\d.]+)/)?.[1]);
     const inStock = /"instock":true/.test(html) && /"purchasable":true/.test(html);
+    const brand = decodeHtml(html.match(/itemprop="brand"[\s\S]{0,300}?itemprop="name">([^<]+)/)?.[1] || '');
     if (!checked) return [];
-    return [{ title, text: `${checked} ${title}`, price, inStock, url }];
+    return [{ title, brand, text: `${checked} ${title}`, price, inStock, url }];
   },
 };
 

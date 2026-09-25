@@ -93,7 +93,11 @@ export function isNotPerfume(text) {
 // Strip brand, concentration, size and marketing filler from a title, leaving the fragrance name.
 export function fragranceName(title, brand, vendor) {
   // Parentheticals are packaging/edition chatter: "(Unisex)", "(Sample)", "(DISCONTINUED)", "(Tester)".
-  let t = ' ' + words(String(title).replace(/\([^)]*\)/g, ' ')) + ' ';
+  // Sizes go before punctuation is stripped, or "3.4 oz" leaves a stray "3" behind.
+  let t = ' ' + words(String(title)
+    .replace(/\([^)]*\)/g, ' ')
+    .replace(/\b\d+(?:\s*\/\s*\d+)+\s*(ml|oz)\b/gi, ' ')
+    .replace(/(^|[^\w.])\d*[.,]?\d+\s*(ml|oz|fl\.?\s*oz)\b\.?/gi, ' ')) + ' ';
   const brandForms = new Set([words(brand), words(vendor), words(vendor).replace(BRAND_SUFFIX, '')]);
   for (const [alias, canon] of Object.entries(BRAND_ALIASES)) if (canon === brand) brandForms.add(alias);
   // Longest first so "christian dior" goes before "dior".
