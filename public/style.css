@@ -113,3 +113,22 @@ dialog button.primary { background: var(--accent); border-color: var(--accent); 
   td.num { width: 72px; }
   .detail h1 { font-size: 22px; }
 }
+
+.tagline { font-size: 12px; font-weight: 500; color: var(--dim); letter-spacing: 0; margin-left: 4px; }
+.pitch { font-size: 22px; letter-spacing: -.01em; color: var(--ink); margin: 8px 0 6px; }
+.meta .linkish { font-size: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.decant-summary { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; margin-top: 12px; padding: 12px 14px; border-radius: var(--radius); background: var(--best); color: var(--best-ink); text-decoration: none; font-size: 14.5px; }
+.decant-summary b { font-size: 16px; }
+.results .px b { color: var(--best-ink); }
+#shopsDlg h2 { font-size: 15px; margin: 4px 0 6px; }
+#shopsDlg h2 + ul { margin-bottom: 16px; }
+.shops { list-style: none; margin: 0; padding: 0; max-height: 40vh; overflow-y: auto; border: 1px solid var(--line); border-radius: 8px; }
+.shops li { display: flex; justify-content: space-between; gap: 8px; padding: 7px 10px; border-top: 1px solid var(--line); font-size: 14px; }
+.shops li:first-child { border-top: 0; }
+.shops li a { color: var(--accent); font-weight: 600; text-decoration: none; margin-right: auto; }
+@media (max-width: 520px) { .tagline { display: none; } }
+.popular-head { display: flex; justify-content: space-between; align-items: baseline; margin-top: 22px; }
+.popular-head h2 { font-size: 15px; margin: 0; color: var(--ink); }
+.popular-head a { color: var(--accent); font-weight: 600; font-size: 14px; text-decoration: none; }
+.rank { width: 2.4em; flex: none; color: var(--dim); font-variant-numeric: tabular-nums; }
+.results li a .nm { flex: 1; }

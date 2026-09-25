@@ -1,11 +1,11 @@
 {
-  "_comment": "Only stores with a public, structured product feed. kind: 'discount' = full-bottle discounter, 'decant' = decant/sample shop, 'mixed' = sells both (small sizes count as decants only when labelled as samples). Shopify stores expose /products.json. brandFrom 'title' = the shop's vendor field is the shop itself, so the house is read from the product title. adapter 'jsonld' = sitemap + schema.org Product data on each page, refreshed in a rotating daily budget.",
+  "_comment": "Only stores with a public, structured product feed. kind: 'discount' = full-bottle discounter, 'decant' = decant/sample shop, 'mixed' = sells both (small sizes count as decants only when labelled as samples). Shopify stores expose /products.json. brandFrom 'title' = the shop's vendor field is the shop itself, so the house is read from the product title. adapter 'sitemap' = product URLs from the sitemap, a rotating slice checked each day (pageFormat 'jsonld' reads schema.org data from the page; 'shopify-js' reads Shopify's per-product .js for shops that block the bulk feed).",
   "sources": [
     {
       "id": "maxaroma",
       "name": "MaxAroma",
       "kind": "discount",
-      "adapter": "jsonld",
+      "adapter": "sitemap",
       "base": "https://www.maxaroma.com",
       "sitemap": "https://www.maxaroma.com/sitemap.xml",
       "idPattern": "/pid/(\\d+)/",
@@ -20,7 +20,8 @@
         "^fragrance/niche",
         "^pocket-perfume",
         "^vial"
-      ]
+      ],
+      "pageFormat": "jsonld"
     },
     {
       "id": "perfumania",
@@ -108,6 +109,19 @@
       "base": "https://sensabeauty.com"
     },
     {
+      "id": "venba",
+      "name": "Venba Fragrance",
+      "kind": "mixed",
+      "adapter": "sitemap",
+      "pageFormat": "shopify-js",
+      "base": "https://www.venbafragrance.com",
+      "sitemap": "https://www.venbafragrance.com/sitemap.xml",
+      "sitemapInclude": "sitemap_products",
+      "idPattern": "/products/([^/?#.]+)",
+      "dailyBudget": 900,
+      "maxAgeDays": 10
+    },
+    {
       "id": "fragrancelord",
       "name": "Fragrancelord",
       "kind": "mixed",
@@ -127,6 +141,19 @@
       "kind": "mixed",
       "adapter": "shopify",
       "base": "https://www.scentsangel.com"
+    },
+    {
+      "id": "luckyscent",
+      "name": "Luckyscent",
+      "kind": "mixed",
+      "adapter": "sitemap",
+      "pageFormat": "jsonld",
+      "base": "https://www.luckyscent.com",
+      "sitemap": "https://www.luckyscent.com/sitemap.xml",
+      "sitemapInclude": "product",
+      "idPattern": "/products/([^/?#]+)",
+      "dailyBudget": 600,
+      "maxAgeDays": 10
     },
     {
       "id": "decantx",
@@ -271,6 +298,39 @@
       "kind": "decant",
       "adapter": "shopify",
       "base": "https://www.scentsuave.com",
+      "brandFrom": "title"
+    },
+    {
+      "id": "decanthouse",
+      "name": "Decant House",
+      "kind": "decant",
+      "adapter": "sitemap",
+      "pageFormat": "nopcommerce",
+      "base": "https://www.decanthouse.com",
+      "sitemap": "https://www.decanthouse.com/sitemap.xml",
+      "idPattern": "decanthouse\\.com/([^/?#]+)$",
+      "dailyBudget": 400,
+      "maxAgeDays": 10
+    },
+    {
+      "id": "surrendertochance",
+      "name": "Surrender to Chance",
+      "kind": "decant",
+      "adapter": "sitemap",
+      "pageFormat": "bigcommerce",
+      "base": "https://surrendertochance.com",
+      "sitemap": "https://surrendertochance.com/xmlsitemap.php",
+      "sitemapInclude": "type=products",
+      "idPattern": "surrendertochance\\.com/([^/?#]+)/?$",
+      "dailyBudget": 700,
+      "maxAgeDays": 14
+    },
+    {
+      "id": "projectfrags",
+      "name": "Project Frags",
+      "kind": "decant",
+      "adapter": "shopify",
+      "base": "https://projectfrags.com",
       "brandFrom": "title"
     }
   ]

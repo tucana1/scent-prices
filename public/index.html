@@ -3,19 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Scent Prices</title>
-<meta name="description" content="Cheapest place to buy any perfume, full bottles and decants. No affiliate links.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='9' y='10' width='14' height='18' rx='3' fill='%238a5a44'/><rect x='13' y='4' width='6' height='6' rx='1' fill='%238a5a44'/></svg>">
+<title>Scent Prices · Decant Price Comparison</title>
+<meta name="description" content="Compare decant and sample prices for any fragrance across dozens of decant shops and Reddit splits, plus full-bottle discounters. No affiliate links.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='9' y='10' width='14' height='18' rx='3' fill='%23000000'/><rect x='13' y='4' width='6' height='6' rx='1' fill='%23000000'/></svg>">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header class="top">
   <div class="toprow">
-    <a href="#" class="logo">Scent<span>Prices</span></a>
+    <a href="#" class="logo">Scent<span>Prices</span> <small class="tagline">decant price comparison</small></a>
     <button class="reddit-btn" data-reddit title="Submit a Reddit sale or decant post">+ Add a Reddit post</button>
   </div>
   <div class="search">
-    <input id="q" type="search" placeholder="Search a fragrance — e.g. sauvage edt, aventus, lattafa khamrah" autocomplete="off" autofocus>
+    <input id="q" type="search" placeholder="Search a fragrance to compare decants — e.g. aventus, baccarat rouge, khamrah" autocomplete="off" autofocus>
   </div>
   <p class="meta" id="meta">Loading index…</p>
 </header>
@@ -24,8 +24,11 @@
   <ol id="results" class="results"></ol>
   <section id="detail" class="detail" hidden></section>
   <section id="empty" class="hint">
-    <p>Type a brand or fragrance name. Prices are pulled daily from discounters and decant shops, plus Reddit sale posts people submit.</p>
+    <h1 class="pitch">Find the cheapest decant of any fragrance.</h1>
+    <p>Search a fragrance and see every decant shop's price side by side, sorted by price per ml. Prices update daily, and Reddit splits people submit are included. Full-bottle prices from discounters are there too, for when you're ready to commit.</p>
     <p>No affiliate links, no sponsored placements. Click through and buy wherever is cheapest.</p>
+    <div class="popular-head"><h2>Popular fragrances</h2><a href="#/popular">See the top 1,000 →</a></div>
+    <ol id="popular" class="results"></ol>
     <div class="reddit-card">
       <h2>Found it cheaper on Reddit?</h2>
       <p>Decant splits and sales on r/fragranceswap, r/DecantHouse and similar subs are often the cheapest option. Paste the post link here and its prices get added to the matching fragrances.</p>
@@ -54,6 +57,13 @@
       <textarea name="text" rows="4"></textarea></label>
     <p class="small">A bot replies on the GitHub issue with the prices it found. They show up here after the next site update.</p>
     <div class="row"><button value="cancel" formnovalidate>Cancel</button><button value="ok" class="primary">Continue to GitHub</button></div>
+  </form>
+</dialog>
+
+<dialog id="shopsDlg">
+  <form method="dialog">
+    <div id="shopsList"></div>
+    <div class="row"><button value="close" class="primary">Close</button></div>
   </form>
 </dialog>
 

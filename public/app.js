@@ -20,16 +20,18 @@ function shardOf(id) {
 
 async function loadIndex() {
   index = await fetch('data/index.json').then((r) => r.json());
-  items = index.rows.map(([b, name, conc, minBottle, minBottleMl, minDecant, n]) => {
+  items = index.rows.map(([b, name, conc, minBottle, minBottleMl, minDecant, n, nShops = 0, nDecantShops = 0]) => {
     const brand = index.brands[b];
     const id = [slug(brand), slug(name), conc ? conc.toLowerCase() : ''].filter(Boolean).join('--');
-    return { id, brand, name, conc, minBottle, minBottleMl, minDecant, n, hay: ` ${words(`${brand} ${name} ${conc} ${CONC[conc] || ''}`)} `, brandW: words(brand) };
+    return { id, brand, name, conc, minBottle, minBottleMl, minDecant, n, nShops, nDecantShops, hay: ` ${words(`${brand} ${name} ${conc} ${CONC[conc] || ''}`)} `, brandW: words(brand) };
   });
   const age = Math.round((Date.now() - Date.parse(index.updated)) / 3600000);
   const shops = Object.values(index.sources);
   const nDisc = shops.filter((s) => s.kind === 'discount').length;
   const nDecant = shops.filter((s) => s.kind === 'decant' || s.kind === 'mixed').length;
-  $('#meta').textContent = `${items.length.toLocaleString()} fragrances · ${nDisc} discounters · ${nDecant} decant shops + Reddit · updated ${age < 1 ? 'just now' : `${age}h ago`}`;
+  const pop = items.filter((it) => it.minDecant).slice(0, 12);
+  $('#popular').innerHTML = pop.map((it) => resultRow(it)).join('');
+  $('#meta').innerHTML = `${items.length.toLocaleString()} fragrances · <button class="linkish" data-shops="decant">${nDecant} decant shops</button> · <button class="linkish" data-shops="discount">${nDisc} discounters</button> + Reddit · updated ${age < 1 ? 'just now' : `${age}h ago`}`;
 }
 
 function search(q) {
@@ -48,21 +50,57 @@ function search(q) {
     }
     if (!ok) continue;
     if (toks.join(' ') === it.brandW) score -= 1; // pure brand query: keep popularity order
-    out.push([score * 1000 + Math.min(it.n, 999), it]);
+    // Decant comparison first: among equally good matches, ones with decants rank higher.
+    out.push([score * 1000 + (it.minDecant ? 500 : 0) + Math.min(it.n, 499), it]);
     if (out.length > 3000) break;
   }
   return out.sort((a, b) => b[0] - a[0]).slice(0, 40).map((x) => x[1]);
+}
+
+// Which shops we track: opened from the counts under the search box.
+function openShops(first) {
+  const groups = [
+    ['decant', 'Decant & sample shops', (k) => k === 'decant' || k === 'mixed'],
+    ['discount', 'Full-bottle discounters', (k) => k === 'discount'],
+  ];
+  if (first === 'discount') groups.reverse();
+  $('#shopsList').innerHTML = groups.map(([, title, test]) => {
+    const list = Object.values(index.sources).filter((s) => test(s.kind)).sort((a, b) => (b.n || 0) - (a.n || 0) || a.name.localeCompare(b.name));
+    return `<h2>${title} <span class="dim">(${list.length})</span></h2>
+      <ul class="shops">${list.map((s) => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener nofollow">${esc(s.name)}</a>${s.kind === 'mixed' ? ' <span class="tag">bottles + samples</span>' : ''}${s.n ? `<span class="dim">${s.n.toLocaleString()} fragrances</span>` : ''}</li>`).join('')}</ul>`;
+  }).join('') + `<p class="small dim">Plus Reddit decant splits and sales that people submit. Shops are added when they publish a public product feed, so there's no scraping around bot protection.</p>`;
+  $('#shopsDlg').showModal();
+}
+
+function resultRow(it, rank) {
+  return `
+    <li><a href="#/p/${it.id}">${rank ? `<span class="rank">${rank}</span>` : ''}
+      <span class="nm"><b>${esc(it.name)}</b> <span class="br">${esc(it.brand)}</span>${it.conc ? ` <span class="tag">${it.conc}</span>` : ''}</span>
+      <span class="px">${it.minDecant ? `decants from <b>${money(it.minDecant)}/ml</b>${it.nDecantShops > 1 ? ` <small>· ${it.nDecantShops} shops</small>` : ''}` : '<span class="dim">no decants yet</span>'}${it.minBottle ? `<span class="dc">bottles from ${money(it.minBottle)} · ${Math.round(it.minBottleMl)} ml</span>` : ''}</span>
+    </a></li>`;
 }
 
 function renderResults(list, q) {
   const el = $('#results');
   $('#empty').hidden = !!q;
   if (q && !list.length) { el.innerHTML = `<li class="none">No matches for “${esc(q)}”.</li>`; return; }
-  el.innerHTML = list.map((it) => `
-    <li><a href="#/p/${it.id}">
-      <span class="nm"><b>${esc(it.name)}</b> <span class="br">${esc(it.brand)}</span>${it.conc ? ` <span class="tag">${it.conc}</span>` : ''}</span>
-      <span class="px">${it.minBottle ? `from <b>${money(it.minBottle)}</b> <small>${Math.round(it.minBottleMl)} ml</small>` : ''}${it.minDecant ? `<span class="dc">decants ${money(it.minDecant)}/ml</span>` : ''}</span>
-    </a></li>`).join('');
+  el.innerHTML = list.map((it) => resultRow(it)).join('');
+}
+
+// Top 1000: ranked by how many shops stock each fragrance (items are pre-sorted that way).
+function showPopular() {
+  $('#detail').hidden = false;
+  $('#empty').hidden = true;
+  $('#results').innerHTML = '';
+  document.title = 'Top 1000 fragrances · Scent Prices';
+  const top = items.slice(0, 1000);
+  const withDecants = top.filter((it) => it.minDecant).length;
+  $('#detail').innerHTML = `
+    <a href="#" class="back">← Back to search</a>
+    <h1>Top 1,000 fragrances</h1>
+    <p class="dim">Ranked by how many of the tracked shops stock each one, a stand-in for popularity. ${withDecants.toLocaleString()} of them have decants listed right now.</p>
+    <ol class="results">${top.map((it, i) => resultRow(it, i + 1)).join('')}</ol>`;
+  window.scrollTo(0, 0);
 }
 
 function sparkline(series, w = 140, h = 32) {
@@ -137,7 +175,7 @@ async function showPerfume(id) {
 
   const dLo = lowest(p.hist.d);
   const decantHtml = p.decants.length ? `
-    <h2 class="sec">Decants <span class="dim">sorted by price per ml</span></h2>
+    <h2 class="sec" id="decants">Decants <span class="dim">sorted by price per ml</span></h2>
     ${dLo ? `<p class="hist">${sparkline(p.hist.d)}<span>lowest tracked shop decant <b>${money(dLo[1])}/ml</b> <small>${dayToDate(dLo[0])}</small></span></p>` : ''}
     <table><tbody>${p.decants.map((o, i) => `
       <tr class="${i === 0 ? 'best' : ''}">
@@ -153,6 +191,9 @@ async function showPerfume(id) {
     <a href="#" class="back">← Back to search</a>
     <h1>${esc(it.name)} <span class="br">${esc(it.brand)}</span></h1>
     <p class="dim">${CONC[it.conc] || 'Concentration not specified'}</p>
+    ${p.decants.length ? `<a href="#decants" class="decant-summary" data-jump>
+      <span>Cheapest decant <b>${money(p.decants[0].price / p.decants[0].ml)}/ml</b> at ${esc(index.sources[p.decants[0].src]?.name || p.decants[0].src)} (${p.decants[0].ml} ml for ${money(p.decants[0].price)})</span>
+      <span class="dim">${new Set(p.decants.map((o) => o.src)).size} decant shops ↓</span></a>` : ''}
     <h2 class="sec">Full bottles</h2>
     ${bottleHtml || '<p class="dim">No full bottles in stock at tracked shops right now.</p>'}
     ${decantHtml}`;
@@ -170,10 +211,16 @@ $('#redditForm').addEventListener('submit', (e) => {
   const u = `https://github.com/${window.SITE_CONFIG.repo}/issues/new?labels=reddit&title=${encodeURIComponent('Reddit prices: ' + f.get('url'))}&body=${encodeURIComponent(body)}`;
   window.open(u, '_blank', 'noopener');
 });
-document.addEventListener('click', (e) => { if (e.target.closest('[data-reddit]')) openRedditDialog(); });
+document.addEventListener('click', (e) => {
+  if (e.target.closest('[data-reddit]')) openRedditDialog();
+  const shops = e.target.closest('[data-shops]');
+  if (shops) openShops(shops.dataset.shops);
+  if (e.target.closest('[data-jump]')) { e.preventDefault(); $('#decants')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+});
 
 let lastQ = '';
 function route() {
+  if (location.hash === '#/popular') { showPopular(); return; }
   const m = location.hash.match(/^#\/p\/(.+)$/);
   if (m) { showPerfume(decodeURIComponent(m[1])); return; }
   $('#detail').hidden = true;

@@ -63,6 +63,15 @@ async function* shopifyProducts(base) {
   }
 }
 
+// Decant shops: anything in the original bottle is a full bottle, the rest is a decant.
+// 'mixed' shops sell both: small sizes count as decants only when labelled so.
+function kindOf(src, ml, text, inOriginalBottle = /manufacturer|original bottle|full bottle|retail bottle/i.test(text)) {
+  const labelledSample = /sample|decant|atomizer|vial|split/i.test(text);
+  return (src.kind === 'decant' && ml <= 35 && !(inOriginalBottle && ml > 15)) ||
+    (src.kind === 'mixed' && (ml <= 15 || (ml <= 35 && labelledSample)))
+    ? 'decant' : 'bottle';
+}
+
 function offersFromShopify(src, p, knownBrands) {
   const out = [];
   const productText = `${p.title} ${p.product_type || ''}`;
@@ -86,12 +95,7 @@ function offersFromShopify(src, p, knownBrands) {
     if (!ml || !(price > 0)) continue;
     // Decant shops: anything in the original bottle is a full bottle, the rest is a decant.
     const inOriginalBottle = /manufacturer|original bottle|full bottle|retail bottle/i.test(`${p.title} ${vt}`);
-    // 'mixed' shops sell full bottles and samples: small sizes count as decants only when labelled so.
-    const labelledSample = /sample|decant|atomizer|vial|split/i.test(`${p.title} ${vt}`);
-    const kind =
-      (src.kind === 'decant' && ml <= 35 && !(inOriginalBottle && ml > 15)) ||
-      (src.kind === 'mixed' && (ml <= 15 || (ml <= 35 && labelledSample)))
-        ? 'decant' : 'bottle';
+    const kind = kindOf(src, ml, `${p.title} ${vt}`, inOriginalBottle);
     // A product can list EDT and EDP as variants, so the variant's own label wins.
     const conc = concentration(vt) || concentration(productText);
     out.push({
@@ -116,42 +120,101 @@ function ldProduct(html) {
   for (const m of html.matchAll(/<script[^>]*application\/ld\+json[^>]*>([\s\S]*?)<\/script>/g)) {
     let j;
     try { j = JSON.parse(m[1]); } catch { continue; }
-    for (const node of [j, ...(j['@graph'] || [])].flat()) if (node?.['@type'] === 'Product') return node;
+    for (const node of [j, ...(j['@graph'] || [])].flat()) if (['Product', 'ProductGroup'].includes(node?.['@type'])) return node;
   }
   return null;
 }
+const decodeHtml = (t) => String(t).replace(/&amp;/g, '&').replace(/&#x27;|&#39;/g, "'").replace(/&quot;/g, '"').replace(/<[^>]+>/g, '').trim();
+const inStockLd = (o) => /InStock|LimitedAvailability|PreOrder/i.test(o?.availability || '');
+const ldPrice = (o) => +(o?.price ?? o?.priceSpecification?.[0]?.price ?? o?.lowPrice);
 
-function offerFromLd(src, page, knownBrands, skipped) {
-  const { ld, url, category } = page;
-  const skip = (why) => { skipped[why] = (skipped[why] || 0) + 1; return null; };
-  const offer = Array.isArray(ld.offers) ? ld.offers[0] : ld.offers;
-  const price = +offer?.price;
-  if (!(price > 0) || !/InStock/i.test(offer?.availability || '')) return skip('out of stock');
-  if ((offer.priceCurrency || 'USD') !== 'USD') return skip('not USD');
-  const desc = String(ld.description || '');
-  if (isNotPerfume(`${ld.name} ${desc}`)) return skip('not perfume');
-  const vendor = (typeof ld.brand === 'object' ? ld.brand?.name : ld.brand) || page.pageBrand || brandFromTitle(ld.name, knownBrands);
-  const brand = canonicalBrand(vendor);
-  if (!brand) return skip('unknown brand');
-  const name = fragranceName(ld.name, brand, vendor);
-  const ml = sizeMl(desc) ?? sizeMl(ld.name);
-  if (!name || !ml) return skip('no name/size');
-  const conc = concentration(desc) || concentration(ld.name);
-  return {
-    id: perfumeId(brand, name, conc), brand, name, conc,
-    src: src.id, kind: /^(vial|pocket-perfume)\//.test(category) ? 'decant' : 'bottle', ml, price,
-    tester: /tester/i.test(category) || isTester(`${ld.name} ${desc}`) || undefined,
-    url, seen: today,
-  };
+// Each parser turns a product page into items: { title, brand?, text (size/concentration hints), price, inStock, url }.
+const PAGE_PARSERS = {
+  // schema.org Product / ProductGroup (MaxAroma, Luckyscent, WooCommerce shops)
+  jsonld(html, url) {
+    const ld = ldProduct(html);
+    if (!ld) return [];
+    const brand = (typeof ld.brand === 'object' ? ld.brand?.name : ld.brand) ||
+      html.match(/aria-label="Brand: ([^"]+)"/)?.[1]; // MaxAroma keeps the house in its spec table
+    const desc = String(ld.description || '').slice(0, 300);
+    if (ld['@type'] === 'ProductGroup') {
+      return (ld.hasVariant || []).map((v) => {
+        const o = Array.isArray(v.offers) ? v.offers[0] : v.offers;
+        return { title: ld.name, brand, text: `${v.name || ''} ${v.size || ''} ${desc}`, price: ldPrice(o), inStock: inStockLd(o), url: o?.url || v.url || url };
+      });
+    }
+    const offers = [ld.offers].flat().filter(Boolean);
+    const o = offers.find(inStockLd) || offers[0];
+    return [{ title: ld.name, brand, text: `${ld.name} ${desc}`, price: ldPrice(o), inStock: inStockLd(o), url: ld.url || url }];
+  },
+  // nopCommerce (Decant House): only the default size's price is in the page.
+  nopcommerce(html, url) {
+    const title = decodeHtml(html.match(/<title>([\s\S]*?)<\/title>/)?.[1] || '').split(' - ')[0];
+    // Only the product's own size selector (category pages have sort/page-size dropdowns too).
+    const select = html.match(/<select[^>]*name="product_attribute_\d+"[\s\S]*?<\/select>/)?.[0] || '';
+    const size = decodeHtml(select.match(/<option[^>]*\bselected\b[^>]*>([^<]+)/)?.[1] || '');
+    const price = +(html.match(/"price"\s*:\s*"([\d.]+)"/)?.[1] || html.match(/price-value-\d+"[^>]*>\s*\$([\d.]+)/)?.[1]);
+    // The visible stock line is a placeholder filled in by JavaScript; the embedded schema data is real.
+    const availability = html.match(/"availability"\s*:\s*"([^"]+)"/)?.[1] || '';
+    const brand = decodeHtml(html.match(/Fragrance House:<\/span>\s*<span class="value">\s*<a[^>]*>([^<]+)/)?.[1] || '');
+    if (!size) return [];
+    return [{ title, brand, text: `${size} ${title}`, price, inStock: /InStock/i.test(availability), url }];
+  },
+  // BigCommerce (Surrender to Chance): the default (checked) size option and its price.
+  bigcommerce(html, url) {
+    const title = decodeHtml(html.match(/<title>([\s\S]*?)<\/title>/)?.[1] || '')
+      .replace(/^Buy\s+/i, '').replace(/\s+-\s+Perfume Samples$/i, '');
+    const checked = html.match(/<input[^>]*type="radio"[^>]*\bchecked\b[\s\S]*?form-option-variant">([^<]+)/)?.[1];
+    const price = +(html.match(/"price":\{"without_tax":\{"formatted":"[^"]*","value":([\d.]+)/)?.[1]);
+    const inStock = /"instock":true/.test(html) && /"purchasable":true/.test(html);
+    if (!checked) return [];
+    return [{ title, text: `${checked} ${title}`, price, inStock, url }];
+  },
+};
+
+function offersFromItems(src, page, knownBrands, skipped) {
+  const skip = (why) => { skipped[why] = (skipped[why] || 0) + 1; };
+  const out = [];
+  if (!page.items.length) skip('no product data');
+  for (const it of page.items) {
+    if (!(it.price > 0) || !it.inStock) { skip('out of stock'); continue; }
+    if (isNotPerfume(`${it.title} ${it.text}`)) { skip('not perfume'); continue; }
+    const vendor = it.brand || brandFromTitle(it.title, knownBrands);
+    const brand = canonicalBrand(vendor);
+    if (!brand) { skip('unknown brand'); continue; }
+    const name = fragranceName(it.title, brand, vendor);
+    const ml = sizeMl(it.text) ?? sizeMl(it.title);
+    if (!name || !ml) { skip('no name/size'); continue; }
+    const conc = concentration(it.text) || concentration(it.title);
+    const byCategory = /^(vial|pocket-perfume)\//.test(page.category || '') ? 'decant' : null; // MaxAroma's own decants
+    out.push({
+      id: perfumeId(brand, name, conc), brand, name, conc,
+      src: src.id, kind: byCategory || kindOf(src, ml, `${it.title} ${it.text}`), ml, price: it.price,
+      tester: /tester/i.test(page.category || '') || isTester(`${it.title} ${it.text}`) || undefined,
+      url: it.url, seen: today,
+    });
+  }
+  return out;
 }
 
 const ADAPTERS = {
-  async jsonld(src) {
-    const sitemap = await fetchWithRetry(src.sitemap, src.throttle, 'application/xml');
-    if (!sitemap) throw new Error('sitemap unavailable');
-    const include = new RegExp(src.include);
-    const byKey = new Map(); // one URL per product id (the same product is listed under several categories)
-    for (const [, url] of sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)) {
+  // Sitemap-driven shops, checked in a rotating daily slice. pageFormat:
+  //   'shopify-js'  - Shopify's per-product /products/<handle>.js, for Shopify shops that block
+  //                   the bulk /products.json feed but allow product pages (Venba)
+  //   anything else - a PAGE_PARSERS entry run on the product's HTML page
+  async sitemap(src) {
+    const shopifyJs = src.pageFormat === 'shopify-js';
+    const throttle = shopifyJs ? shopifyThrottle : src.throttle; // Shopify's per-IP budget is shared
+    let xml = await fetchWithRetry(src.sitemap, throttle, 'application/xml');
+    if (!xml) throw new Error('sitemap unavailable');
+    if (/<sitemapindex/.test(xml)) {
+      const children = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1].replace(/&amp;/g, '&'))
+        .filter((u) => new RegExp(src.sitemapInclude || '.').test(u));
+      xml = (await Promise.all(children.map((u) => fetchWithRetry(u, throttle, 'application/xml')))).join('\n');
+    }
+    const include = new RegExp(src.include || '.');
+    const byKey = new Map(); // one URL per product id (the same product can be listed under several categories)
+    for (const [, url] of xml.matchAll(/<loc>([^<]+)<\/loc>/g)) {
       const key = url.match(new RegExp(src.idPattern))?.[1];
       const category = new URL(url).pathname.split('/').slice(1, 3).join('/');
       if (key && include.test(category) && !byKey.has(key)) byKey.set(key, { url, category });
@@ -165,12 +228,20 @@ const ADAPTERS = {
       .slice(0, budget);
     const pages = [];
     for (const key of due) {
-      const html = await fetchWithRetry(byKey.get(key).url, src.throttle, 'text/html').catch(() => null);
+      const pageUrl = shopifyJs ? `${src.base}/products/${key}.js` : byKey.get(key).url;
+      const body = await fetchWithRetry(pageUrl, throttle, shopifyJs ? 'application/json' : 'text/html').catch(() => null);
       checked[key] = dayNum(today);
-      const ld = html && ldProduct(html);
-      // The house is in the page's spec table even when the JSON-LD omits it.
-      const pageBrand = html?.match(/aria-label="Brand: ([^"]+)"/)?.[1];
-      if (ld) pages.push({ key, ld, pageBrand, ...byKey.get(key), url: ld.url || byKey.get(key).url });
+      if (!body) continue;
+      if (shopifyJs) {
+        let p;
+        try { p = JSON.parse(body); } catch { continue; }
+        // .js prices are in cents; reshape to the /products.json variant format.
+        pages.push({ key, product: { title: p.title, vendor: p.vendor, product_type: p.type, handle: p.handle,
+          variants: p.variants.map((v) => ({ id: v.id, title: v.title, price: (v.price / 100).toFixed(2), available: v.available })) } });
+      } else {
+        const { url, category } = byKey.get(key);
+        pages.push({ key, category, items: PAGE_PARSERS[src.pageFormat](body, url) });
+      }
     }
     const fresh = new Set(due);
     const keyOf = (url) => url.match(new RegExp(src.idPattern))?.[1];
@@ -178,10 +249,13 @@ const ADAPTERS = {
       dayNum(today) - dayNum(o.seen) <= src.maxAgeDays);
     const coverage = Object.keys(checked).filter((k) => byKey.has(k)).length;
     const skipped = {};
+    const fromPage = (p, knownBrands) => (shopifyJs
+      ? offersFromShopify(src, p.product, knownBrands).map((o) => ({ ...o, seen: today }))
+      : offersFromItems(src, p, knownBrands, skipped));
     return {
       offers: [], scanned: pages.length, deferred: true,
-      resolve: (knownBrands) => [...pages.map((p) => offerFromLd(src, p, knownBrands, skipped)).filter(Boolean), ...carried],
-      summarize: () => `${due.length} pages checked today, ${coverage}/${byKey.size} checked this cycle, ${carried.length} offers carried forward; skipped ${JSON.stringify(skipped)}`,
+      resolve: (knownBrands) => [...pages.flatMap((p) => fromPage(p, knownBrands)), ...carried],
+      summarize: () => `${due.length} pages checked today, ${coverage}/${byKey.size} checked this cycle, ${carried.length} offers carried forward${Object.keys(skipped).length ? `; skipped ${JSON.stringify(skipped)}` : ''}`,
     };
   },
 
@@ -219,7 +293,7 @@ try {
 const stateFile = new URL('../build/jsonld-state.json', import.meta.url);
 let jsonldState = {};
 try { jsonldState = JSON.parse(await readFile(stateFile)); } catch {}
-for (const src of sources) if (src.adapter === 'jsonld') src.throttle = makeThrottle(src.rps || 1);
+for (const src of sources) if (src.adapter === 'sitemap') src.throttle = makeThrottle(src.rps || 1);
 
 // Crawl all sources concurrently; the shared throttle above keeps the total request rate polite.
 const results = await Promise.all(picked.map(async (src) => {

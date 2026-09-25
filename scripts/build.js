@@ -131,20 +131,35 @@ for (const [id, p] of perfumes) {
 
   if (!brandIdx.has(p.brand)) { brandIdx.set(p.brand, brands.length); brands.push(p.brand); }
   const name = titleCase(p.name);
-  const minBottle = bottles.length ? bottles[0].price : 0;
-  const minBottleMl = bottles.length ? bottles[0].ml : 0;
+  // "Bottles from": the cheapest real bottle (30 ml+) when there is one, not a 3 ml mini.
+  const fullSize = bottles.filter((o) => o.ml >= 30);
+  const headline = (fullSize.length ? fullSize : bottles)[0];
+  const minBottle = headline?.price || 0;
+  const minBottleMl = headline?.ml || 0;
   const minDecantPerMl = decants.length ? +(decants[0].price / decants[0].ml).toFixed(2) : 0;
-  rows.push([brandIdx.get(p.brand), name, p.conc, minBottle, minBottleMl, minDecantPerMl, offers.length]);
+  // Popularity proxy: how many different shops stock it (no public "most popular" dataset exists).
+  const nShops = new Set(offers.map((o) => o.src)).size;
+  const nDecantShops = new Set(decants.map((o) => o.src)).size;
+  rows.push([brandIdx.get(p.brand), name, p.conc, minBottle, minBottleMl, minDecantPerMl, offers.length, nShops, nDecantShops]);
   shards[shardOf(id)][id] = { bottles, decants, hist };
 }
 
-// Most-listed perfumes first, so ties in search favour popular ones.
-rows.sort((a, b) => b[6] - a[6]);
+// Most widely stocked first, so ties in search (and the Top 1000 page) favour popular ones.
+rows.sort((a, b) => b[7] - a[7] || b[6] - a[6]);
+const top = rows.slice(0, 1000);
+const covered = (k) => top.filter((r) => r[8] >= k).length;
+console.log(`top 1000 (by shops stocking): ${covered(1)} have decants, ${covered(3)} have 3+ decant shops, ${covered(5)} have 5+`);
 
 const out = new URL('public/data/', root);
 await rm(out, { recursive: true, force: true });
 await mkdir(new URL('p/', out), { recursive: true });
-const srcMeta = Object.fromEntries(sources.map((s) => [s.id, { name: s.name, kind: s.kind, url: s.base }]));
+// How many fragrances each shop lists, shown in the "which shops" dialog.
+const perSource = new Map();
+for (const [id, p] of perfumes) for (const o of p.offers.values()) {
+  if (!perSource.has(o.src)) perSource.set(o.src, new Set());
+  perSource.get(o.src).add(id);
+}
+const srcMeta = Object.fromEntries(sources.map((s) => [s.id, { name: s.name, kind: s.kind, url: s.base, n: perSource.get(s.id)?.size || 0 }]));
 srcMeta.reddit = { name: 'Reddit', kind: 'reddit' };
 await writeFile(new URL('index.json', out), JSON.stringify({ updated: scraped.scrapedAt || new Date().toISOString(), sources: srcMeta, brands, rows }));
 await Promise.all(shards.map((s, i) => writeFile(new URL(`p/${i.toString(16).padStart(2, '0')}.json`, out), JSON.stringify(s))));

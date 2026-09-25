@@ -69,8 +69,10 @@ export function concentration(text) {
 }
 
 export function sizeMl(text) {
-  const t = String(text || '').toLowerCase().replace(/,/g, '.');
-  let m = t.match(/(\d+(?:\.\d+)?)\s*ml\b/);
+  const t = String(text || '').toLowerCase().replace(/,(?=\d)/g, '.');
+  let m = t.match(/\b(\d+)\s*\/\s*(\d+)\s*ml\b/); // "1/2 ml" vials
+  if (m && +m[2]) return +(+m[1] / +m[2]).toFixed(2);
+  m = t.match(/(\d+(?:\.\d+)?)\s*ml\b/);
   if (m) return +m[1];
   m = t.match(/(\d*\.?\d+)\s*(?:fl\.?\s*)?oz\b/);
   if (m) {
