@@ -53,11 +53,16 @@ for (const o of all) {
   if (!byBase.has(base)) byBase.set(base, new Set());
   if (o.conc) byBase.get(base).add(o.conc);
 }
+// With several versions, fold into one only if it clearly dominates (3x the offers of the runner-up).
+const offerCount = new Map();
+for (const o of all) offerCount.set(o.id, (offerCount.get(o.id) || 0) + 1);
 for (const o of all) {
   if (o.conc) continue;
-  const concs = byBase.get(o.id);
-  if (concs?.size === 1) {
-    o.conc = [...concs][0];
+  const concs = [...(byBase.get(o.id) || [])];
+  if (!concs.length) continue;
+  const ranked = concs.map((c) => [c, offerCount.get(perfumeId(o.brand, o.name, c)) || 0]).sort((a, b) => b[1] - a[1]);
+  if (ranked.length === 1 || ranked[0][1] >= 3 * ranked[1][1]) {
+    o.conc = ranked[0][0];
     o.id = perfumeId(o.brand, o.name, o.conc);
   }
 }

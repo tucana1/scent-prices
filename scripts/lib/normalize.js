@@ -96,12 +96,16 @@ export function fragranceName(title, brand, vendor) {
   for (const [alias, canon] of Object.entries(BRAND_ALIASES)) if (canon === brand) brandForms.add(alias);
   // Longest first so "christian dior" goes before "dior".
   for (const b of [...brandForms].filter(Boolean).sort((a, b) => b.length - a.length)) {
-    t = t.replace(new RegExp(` by ${b} `, 'g'), ' ').replace(new RegExp(` ${b} `, 'g'), ' ');
+    // Keep the brand when it's part of the name: "Bleu de Chanel", "Terre d'Hermes", "Eau de Rochas".
+    t = t.replace(new RegExp(` by ${b} `, 'g'), ' ').replace(new RegExp(`(?<!\\b(?:de|di|du|d)) ${b} `, 'g'), ' ');
   }
   t = t
+    // Award/listing chatter some shops append ("2017 voted one of best releases", "last call").
+    .replace(/\b((19|20)\d{2} )?(voted|finalist|foundation|basenotes|last call)\b.*$/, ' ')
     .replace(/\b\d*\.?\d+\s*(ml|oz|fl oz|fl)\b/g, ' ')
-    .replace(/\b(extrait de parfum|eau de parfum|eau de toilette|eau de cologne|eau fraiche|edp|edt|edc|extrait|parfum intense|parfum)\b/g, (m) => (m === 'parfum intense' ? 'intense' : ' '))
-    .replace(/\b(spray|splash|vaporisateur|natural|perfumes?|colognes?|fragrances?|scent|tester|unboxed|new|box item|in box|samples?|decants?|split|retail bottle|travel spray|travel size|manufacturer boxed|boxed|glass sample vial|sample vial|glass spray|vial|mini|\d{4}s batch|\d{4} batch|boxed|for (men|women|man|woman|him|her|unisex)|mens|womens|unisex|men|women|man|woman|by)\b/g, ' ')
+    // "Le Parfum" / "Elixir de Parfum" style names keep the word; plain "Parfum" is concentration.
+    .replace(/\b(extrait de parfum|eau de parfum|eau de toilette|eau de cologne|eau fraiche|edp|edt|edc|extrait|parfum intense|(?<!\ble )parfum)\b/g, (m) => (m === 'parfum intense' ? 'intense' : ' '))
+    .replace(/\b(spray|splash|vaporisateur|natural|perfumes?|colognes?|fragrances?|scent|tester|unboxed|new|box item|in box|samples?|decants?|split|retail bottle|travel spray|travel size|xl|private blend|private line|manufacturer boxed|boxed|glass sample vial|sample vial|glass spray|vial|mini|\d{4}s batch|\d{4} batch|boxed|for (men|women|man|woman|him|her|unisex)|mens|womens|unisex|men|women|man|woman|by)\b/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
   return t;

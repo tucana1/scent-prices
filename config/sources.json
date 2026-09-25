@@ -30,6 +30,56 @@
       "base": "https://perfumebox.com"
     },
     {
+      "id": "perfumeshopusa",
+      "name": "The Perfume Shop USA",
+      "kind": "discount",
+      "adapter": "shopify",
+      "base": "https://theperfumeshopusa.com"
+    },
+    {
+      "id": "fragflex",
+      "name": "FragFlex",
+      "kind": "discount",
+      "adapter": "shopify",
+      "base": "https://fragflex.com"
+    },
+    {
+      "id": "fragranceusa",
+      "name": "FragranceUSA",
+      "kind": "discount",
+      "adapter": "shopify",
+      "base": "https://www.fragranceusa.com"
+    },
+    {
+      "id": "lattafausa",
+      "name": "Lattafa USA (official)",
+      "kind": "discount",
+      "adapter": "shopify",
+      "base": "https://lattafa-usa.com"
+    },
+    {
+      "id": "nevaeh",
+      "name": "Fragrance Nevaeh",
+      "kind": "discount",
+      "adapter": "shopify",
+      "base": "https://fragrance-nevaeh.com"
+    },
+    {
+      "id": "fragrancewholesale",
+      "name": "Fragrance Wholesale",
+      "kind": "discount",
+      "adapter": "shopify",
+      "base": "https://fragrancewholesale.com"
+    },
+    {
+      "id": "luxuryperfume",
+      "name": "Luxury Perfume",
+      "kind": "discount",
+      "adapter": "shopify",
+      "base": "https://luxuryperfume.com",
+      "brandFrom": "title"
+    },
+    {
       "id": "decantx",
       "name": "DecantX",
       "kind": "decant",

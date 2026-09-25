@@ -151,7 +151,7 @@ for (const r of results) {
     if (!got.length) dropped++;
     r.offers.push(...got);
   }
-  console.log(`${r.src.id}: ${r.scanned} products -> ${r.offers.length} offers (${dropped} products skipped: brand unknown or not perfume)`);
+  console.log(`${r.src.id}: ${r.scanned} products -> ${r.offers.length} offers (${dropped} products skipped: sold out, no size, unknown brand or not perfume)`);
 }
 
 const offers = results.flatMap((r) => r.offers);
