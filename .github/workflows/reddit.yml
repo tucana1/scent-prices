@@ -27,14 +27,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 22, cache: npm }
-      - run: npm ci --omit=dev
-      - name: Extract prices with Claude
+        with: { node-version: 22 }
+      - name: Extract prices with LLM
         id: extract
         continue-on-error: true
         env:
           ISSUE_BODY: ${{ github.event.issue.body }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
           REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
         run: node scripts/reddit-import.js

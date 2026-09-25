@@ -13,7 +13,7 @@ GitHub Actions (daily, free)                     GitHub Pages (free, static)
 └─────────────────────────────┘                  └──────────────────────────┘
         ▲ commit data/reddit.json
 ┌─────────────────────────────┐
-│ reddit.yml: issue → Claude  │ ◀── "Submit a Reddit post" button opens a prefilled GitHub issue
+│ reddit.yml: issue → LLM     │ ◀── "Submit a Reddit post" button opens a prefilled GitHub issue
 └─────────────────────────────┘
 ```
 
@@ -48,7 +48,7 @@ To add a store, add a line to `config/sources.json`. A new Shopify store needs n
 1. Create a GitHub repo (it must be **public** for free Pages) and push this folder.
 2. **Settings → Pages → Source: GitHub Actions.**
 3. **Settings → Secrets → Actions:**
-   - `ANTHROPIC_API_KEY`: used only by the Reddit importer, at about 1–3¢ per post.
+   - `OPENROUTER_API_KEY`: used only by the Reddit importer. The default model is `meta/muse-spark-1.3-contributor` (a small fraction of a cent per post). To use a different OpenRouter model, set the `LLM_MODEL` env var in `reddit.yml`.
    - `REDDIT_CLIENT_ID` and `REDDIT_CLIENT_SECRET` are optional. Without them the importer reads the post's public RSS feed, which needs no account. Anonymous RSS allows about one request per minute per IP, so the importer waits and retries when rate-limited. If Reddit ever blocks GitHub's servers outright, create a free "script" app at <https://www.reddit.com/prefs/apps> and add these two secrets. Pasting the price list into the issue also always works.
 4. Edit `public/config.js` and set `repo` to `your-user/your-repo`.
 5. Create a label called `approved`.
