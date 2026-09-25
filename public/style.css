@@ -1,7 +1,7 @@
 :root {
   --bg: #faf7f4; --panel: #ffffff; --ink: #1f1a17; --dim: #7a6f68; --line: #ebe4de;
   --accent: #8a5a44; --accent-soft: #f3e9e3; --best: #eef6ee; --best-ink: #2f6b35; --warn: #a86a12;
-  --radius: 10px;
+  --radius: 10px; --reddit: #d9480f;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
@@ -27,7 +27,17 @@ a { color: inherit; }
 
 .top { position: sticky; top: 0; z-index: 2; background: var(--bg); border-bottom: 1px solid var(--line); padding: 14px 16px 10px; }
 .top > * { max-width: 760px; margin-left: auto; margin-right: auto; }
-.logo { display: block; font-weight: 700; font-size: 18px; text-decoration: none; letter-spacing: -.01em; margin-bottom: 8px; }
+.toprow { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 8px; }
+.logo { display: block; font-weight: 700; font-size: 18px; text-decoration: none; letter-spacing: -.01em; }
+.reddit-btn { font: inherit; font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 99px; border: 1px solid var(--reddit); color: var(--reddit); background: transparent; cursor: pointer; white-space: nowrap; }
+.reddit-btn:hover { background: var(--reddit); color: #fff; }
+.reddit-card { margin-top: 22px; padding: 16px 18px; border-radius: var(--radius); border: 1px solid var(--line); border-left: 4px solid var(--reddit); background: var(--panel); color: var(--ink); }
+.reddit-card h2 { margin: 0 0 4px; font-size: 16px; }
+.reddit-card p { margin: 0 0 12px; color: var(--dim); font-size: 14px; }
+button.primary { font: inherit; font-weight: 600; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; }
+.reddit-inline { font-size: 13.5px; margin-top: 8px; }
+.steps { margin: 4px 0 4px; padding-left: 20px; font-size: 14px; color: var(--ink); }
+.steps li { margin: 2px 0; }
 .logo span { color: var(--accent); }
 .search input {
   width: 100%; font-size: 17px; padding: 12px 14px; border-radius: var(--radius);
@@ -79,7 +89,7 @@ tr.best td:first-child { border-radius: 6px 0 0 6px; }
 tr.best td:last-child { border-radius: 0 6px 6px 0; }
 .detail > table { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
 .src { font-weight: 600; }
-.src.reddit { color: #d9480f; }
+.src.reddit { color: var(--reddit); }
 .sub { font-size: 12px; color: var(--dim); }
 .note { font-size: 12px; color: var(--dim); }
 

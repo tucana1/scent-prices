@@ -67,7 +67,7 @@ const perfumes = new Map();
 for (const o of all) {
   let p = perfumes.get(o.id);
   if (!p) perfumes.set(o.id, (p = { brand: o.brand, name: o.name, conc: o.conc, offers: new Map() }));
-  const k = `${o.src}|${o.kind}|${sizeBucket(o.ml)}|${o.tester ? 1 : 0}|${o.src === 'reddit' ? o.url : ''}`;
+  const k = `${o.src}|${o.kind}|${sizeBucket(o.ml)}|${o.tester ? 1 : 0}|${o.note || ''}|${o.src === 'reddit' ? o.url : ''}`;
   const prev = p.offers.get(k);
   if (!prev || o.price < prev.price) p.offers.set(k, o);
 }

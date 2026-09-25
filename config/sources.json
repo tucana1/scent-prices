@@ -1,11 +1,155 @@
 {
-  "_comment": "Only stores with a public, structured product feed. kind: 'discount' = full-bottle discounter, 'decant' = decant/sample shop. Shopify stores expose /products.json.",
+  "_comment": "Only stores with a public, structured product feed. kind: 'discount' = full-bottle discounter, 'decant' = decant/sample shop. Shopify stores expose /products.json. brandFrom 'title' = the shop's vendor field is the shop itself, so the house is read from the product title.",
   "sources": [
-    { "id": "perfumania",     "name": "Perfumania",       "kind": "discount", "adapter": "shopify", "base": "https://perfumania.com" },
-    { "id": "beautyencounter","name": "Beauty Encounter", "kind": "discount", "adapter": "shopify", "base": "https://www.beautyencounter.com" },
-    { "id": "aura",           "name": "Aura Fragrance",   "kind": "discount", "adapter": "shopify", "base": "https://www.aurafragrance.com" },
-    { "id": "perfumebox",     "name": "The Perfume Box",  "kind": "discount", "adapter": "shopify", "base": "https://perfumebox.com" },
-    { "id": "decantx",        "name": "DecantX",          "kind": "decant",   "adapter": "shopify", "base": "https://decantx.com" },
-    { "id": "scentsplit",     "name": "ScentSplit",       "kind": "decant",   "adapter": "shopify", "base": "https://www.scentsplit.com" }
+    {
+      "id": "perfumania",
+      "name": "Perfumania",
+      "kind": "discount",
+      "adapter": "shopify",
+      "base": "https://perfumania.com"
+    },
+    {
+      "id": "beautyencounter",
+      "name": "Beauty Encounter",
+      "kind": "discount",
+      "adapter": "shopify",
+      "base": "https://www.beautyencounter.com"
+    },
+    {
+      "id": "aura",
+      "name": "Aura Fragrance",
+      "kind": "discount",
+      "adapter": "shopify",
+      "base": "https://www.aurafragrance.com"
+    },
+    {
+      "id": "perfumebox",
+      "name": "The Perfume Box",
+      "kind": "discount",
+      "adapter": "shopify",
+      "base": "https://perfumebox.com"
+    },
+    {
+      "id": "decantx",
+      "name": "DecantX",
+      "kind": "decant",
+      "adapter": "shopify",
+      "base": "https://decantx.com"
+    },
+    {
+      "id": "scentsplit",
+      "name": "ScentSplit",
+      "kind": "decant",
+      "adapter": "shopify",
+      "base": "https://www.scentsplit.com"
+    },
+    {
+      "id": "decantsrus",
+      "name": "Decants R Us",
+      "kind": "decant",
+      "adapter": "shopify",
+      "base": "https://decantsrus.com"
+    },
+    {
+      "id": "fragrancesline",
+      "name": "Fragrances Line",
+      "kind": "decant",
+      "adapter": "shopify",
+      "base": "https://fragrancesline.com"
+    },
+    {
+      "id": "microperfumes",
+      "name": "MicroPerfumes",
+      "kind": "decant",
+      "adapter": "shopify",
+      "base": "https://microperfumes.com"
+    },
+    {
+      "id": "perfumedcourt",
+      "name": "The Perfumed Court",
+      "kind": "decant",
+      "adapter": "shopify",
+      "base": "https://theperfumedcourt.com"
+    },
+    {
+      "id": "vintagedecants",
+      "name": "Vintage Decants",
+      "kind": "decant",
+      "adapter": "shopify",
+      "base": "https://vintagedecants.com"
+    },
+    {
+      "id": "olenas",
+      "name": "Olena's Aroma Shop",
+      "kind": "decant",
+      "adapter": "shopify",
+      "base": "https://olenasaromashop.com"
+    },
+    {
+      "id": "mystic",
+      "name": "Mystic Perfume",
+      "kind": "decant",
+      "adapter": "shopify",
+      "base": "https://mysticperfume.com"
+    },
+    {
+      "id": "discoverydecants",
+      "name": "Discovery Decants",
+      "kind": "decant",
+      "adapter": "shopify",
+      "base": "https://discoverydecants.com"
+    },
+    {
+      "id": "tryscents",
+      "name": "TryScents",
+      "kind": "decant",
+      "adapter": "shopify",
+      "base": "https://tryscentsdecants.com"
+    },
+    {
+      "id": "dynasty",
+      "name": "Dynasty Decants",
+      "kind": "decant",
+      "adapter": "shopify",
+      "base": "https://www.dynastydecants.com"
+    },
+    {
+      "id": "decantedclone",
+      "name": "Decanted Clone",
+      "kind": "decant",
+      "adapter": "shopify",
+      "base": "https://decantedclone.com"
+    },
+    {
+      "id": "parfumexquis",
+      "name": "Parfum Exquis",
+      "kind": "decant",
+      "adapter": "shopify",
+      "base": "https://parfumexquis.com"
+    },
+    {
+      "id": "samplescents",
+      "name": "Sample Scents",
+      "kind": "decant",
+      "adapter": "shopify",
+      "base": "https://samplescents.com",
+      "brandFrom": "title"
+    },
+    {
+      "id": "decantalize",
+      "name": "Decantalize",
+      "kind": "decant",
+      "adapter": "shopify",
+      "base": "https://decantalize.com",
+      "brandFrom": "title"
+    },
+    {
+      "id": "scentdecant",
+      "name": "Scent Decant",
+      "kind": "decant",
+      "adapter": "shopify",
+      "base": "https://www.scentdecant.com",
+      "brandFrom": "title"
+    }
   ]
 }

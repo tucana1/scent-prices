@@ -10,7 +10,10 @@
 </head>
 <body>
 <header class="top">
-  <a href="#" class="logo">Scent<span>Prices</span></a>
+  <div class="toprow">
+    <a href="#" class="logo">Scent<span>Prices</span></a>
+    <button class="reddit-btn" data-reddit title="Submit a Reddit sale or decant post">+ Add a Reddit post</button>
+  </div>
   <div class="search">
     <input id="q" type="search" placeholder="Search a fragrance — e.g. sauvage edt, aventus, lattafa khamrah" autocomplete="off" autofocus>
   </div>
@@ -23,11 +26,16 @@
   <section id="empty" class="hint">
     <p>Type a brand or fragrance name. Prices are pulled daily from discounters and decant shops, plus Reddit sale posts people submit.</p>
     <p>No affiliate links, no sponsored placements. Click through and buy wherever is cheapest.</p>
+    <div class="reddit-card">
+      <h2>Found it cheaper on Reddit?</h2>
+      <p>Decant splits and sales on r/fragranceswap, r/DecantHouse and similar subs are often the cheapest option. Paste the post link here and its prices get added to the matching fragrances.</p>
+      <button class="primary" data-reddit>+ Add a Reddit post</button>
+    </div>
   </section>
 </main>
 
 <footer>
-  <button id="submitReddit" class="linkish">+ Submit a Reddit decant/sale post</button>
+  <button class="linkish" data-reddit>+ Add a Reddit post</button>
   <span class="dot">·</span>
   <span>Prices in USD, before shipping and tax. Always confirm on the store's page.</span>
 </footer>
@@ -35,11 +43,16 @@
 <dialog id="redditDlg">
   <form method="dialog" id="redditForm">
     <h2>Add a Reddit post</h2>
-    <p>Paste a link to a decant or sale post (e.g. r/fragranceswap, r/DecantHouse). An AI reads the prices and adds them to the matching fragrances. Posts expire after 60 days.</p>
-    <label>Post URL <input name="url" type="url" required placeholder="https://www.reddit.com/r/…/comments/…"></label>
+    <p>Share a Reddit sale or decant post (r/fragranceswap, r/DecantHouse, etc.). An AI reads the price list and adds each fragrance to the site, marked as Reddit. Posts expire after 60 days.</p>
+    <ol class="steps">
+      <li>Paste the post link below.</li>
+      <li>Click <b>Continue to GitHub</b>. It opens a form that's already filled in.</li>
+      <li>Click <b>Create</b> on GitHub. You need a free GitHub account.</li>
+    </ol>
+    <label>Reddit post link <input name="url" type="url" required placeholder="https://www.reddit.com/r/fragranceswap/comments/…"></label>
     <label>Price list text <small>(optional. Only needed if the prices are in an image or spreadsheet)</small>
-      <textarea name="text" rows="5"></textarea></label>
-    <p class="small">This opens a prefilled GitHub issue. The import runs once you submit it.</p>
+      <textarea name="text" rows="4"></textarea></label>
+    <p class="small">A bot replies on the GitHub issue with the prices it found. They show up here after the next site update.</p>
     <div class="row"><button value="cancel" formnovalidate>Cancel</button><button value="ok" class="primary">Continue to GitHub</button></div>
   </form>
 </dialog>

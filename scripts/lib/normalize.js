@@ -31,7 +31,7 @@ const BRAND_ALIASES = {
 const BRAND_SUFFIX = /\s+(parfums?|perfumes?|fragrances?|paris|beauty|cosmetics|inc|llc)$/;
 
 // Things that are not a bottle of perfume. Checked against title + variant.
-const NOT_PERFUME = /\b(gift ?set|set of|\d+ ?(pc|pcs|piece)|coffret|lotion|shower|gel|deodorant|deo stick|after ?shave|balm|body (wash|mist|spray|cream|oil)|hair (mist|perfume)|soap|candle|diffuser|discovery|sampler|refill(s)?|bundle|kit|pouch|case|wallet|atomizer only|empty)\b/i;
+const NOT_PERFUME = /\b(gift ?set|set of|\d+ ?(pc|pcs|piece)|coffret|lotion|shower|gel|deodorant|deo stick|after ?shave|balm|body (wash|mist|spray|cream|oil)|hair (mist|perfume)|soap|candle|diffuser|discovery|sampler|refill(s)?|bundle|kit|pouch|case|wallet|atomizer only|empty|subscription|gift ?card|mystery|surprise)\b/i;
 
 const OZ_TO_ML = { 0.17: 5, 0.2: 6, 0.25: 7.5, 0.27: 8, 0.3: 9, 0.33: 10, 0.34: 10, 0.5: 15, 0.67: 20, 0.68: 20, 1: 30, 1.3: 40, 1.4: 40, 1.6: 50, 1.7: 50, 2: 60, 2.5: 75, 2.7: 80, 3: 90, 3.3: 100, 3.4: 100, 3.6: 110, 4: 120, 4.2: 125, 5: 150, 6.7: 200, 6.8: 200, 8: 250, 8.4: 250, 10: 300 };
 
@@ -43,7 +43,7 @@ export function slug(s) {
   return ascii(s).toLowerCase().replace(/&/g, ' ').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
-function words(s) {
+export function words(s) {
   return ascii(s).toLowerCase().replace(/&/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
 }
 
@@ -99,7 +99,7 @@ export function fragranceName(title, brand, vendor) {
   t = t
     .replace(/\b\d*\.?\d+\s*(ml|oz|fl oz|fl)\b/g, ' ')
     .replace(/\b(extrait de parfum|eau de parfum|eau de toilette|eau de cologne|eau fraiche|edp|edt|edc|extrait|parfum intense|parfum)\b/g, (m) => (m === 'parfum intense' ? 'intense' : ' '))
-    .replace(/\b(spray|splash|vaporisateur|natural|perfumes?|colognes?|fragrances?|scent|tester|unboxed|new|box item|in box|samples?|decants?|split|for (men|women|him|her|unisex)|men s|women s|mens|womens|unisex|men|women|by)\b/g, ' ')
+    .replace(/\b(spray|splash|vaporisateur|natural|perfumes?|colognes?|fragrances?|scent|tester|unboxed|new|box item|in box|samples?|decants?|split|retail bottle|travel spray|travel size|manufacturer boxed|boxed|glass sample vial|sample vial|glass spray|vial|mini|\d{4} s batch|\d{4} batch|for (men|women|him|her|unisex)|men s|women s|mens|womens|unisex|men|women|by)\b/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
   return t;
@@ -112,4 +112,18 @@ export function perfumeId(brand, name, conc) {
 // oz->ml rounding means 3.3 and 3.4oz both land on 100ml; this groups near-identical sizes.
 export function sizeBucket(ml) {
   return ml == null ? 0 : Math.round(ml);
+}
+
+// For shops whose "vendor" field is the shop itself: read the house from the title instead.
+// "Percival by Parfums de Marly Eau de Parfum" -> "Parfums de Marly"; otherwise match the longest
+// known brand at the start of the title ("Calvin Klein Euphoria" -> "Calvin Klein").
+export function brandFromTitle(title, knownBrands) {
+  const by = String(title).match(/\sby\s+(.+?)(?=\s+(?:eau|edp|edt|parfum|extrait|cologne|for|spray|perfume)\b|\s*[(\-–|,]|\s+\d|$)/i);
+  if (by) return by[1].trim();
+  const t = words(title).split(' ');
+  for (let n = Math.min(5, t.length - 1); n >= 1; n--) {
+    const hit = knownBrands.get(t.slice(0, n).join(' '));
+    if (hit) return hit;
+  }
+  return null;
 }

@@ -84,7 +84,7 @@ function sourceCell(o) {
   if (o.src === 'reddit') {
     return `<span class="src reddit">Reddit</span> <span class="sub">r/${esc(o.sub)} · u/${esc(o.by)} · ${esc(o.posted)}</span>${o.note ? `<div class="note">${esc(o.note)}</div>` : ''}`;
   }
-  return `<span class="src">${esc(s.name)}</span>${o.tester ? ' <span class="tag warn">tester</span>' : ''}`;
+  return `<span class="src">${esc(s.name)}</span>${o.tester ? ' <span class="tag warn">tester</span>' : ''}${o.note ? ` <span class="tag">${esc(o.note)}</span>` : ''}`;
 }
 
 async function showPerfume(id) {
@@ -141,7 +141,8 @@ async function showPerfume(id) {
         <td class="num">${money(o.price)}</td>
         <td class="num dim">${money(o.price / o.ml)}/ml</td>
         <td class="go"><a href="${esc(o.url)}" target="_blank" rel="noopener nofollow">View →</a></td>
-      </tr>`).join('')}</tbody></table>` : `<p class="dim sec">No decants found yet. Know a Reddit split? <button class="linkish" data-reddit>Submit it</button>.</p>`;
+      </tr>`).join('')}</tbody></table>
+    <p class="dim reddit-inline">Seen it cheaper on Reddit? <button class="linkish" data-reddit>Add the post</button></p>` : `<p class="dim sec">No decants found yet. Know a Reddit split? <button class="linkish" data-reddit>Add the post</button></p>`;
 
   det.innerHTML = `
     <a href="#" class="back">← Back to search</a>
@@ -164,8 +165,7 @@ $('#redditForm').addEventListener('submit', (e) => {
   const u = `https://github.com/${window.SITE_CONFIG.repo}/issues/new?labels=reddit&title=${encodeURIComponent('Reddit prices: ' + f.get('url'))}&body=${encodeURIComponent(body)}`;
   window.open(u, '_blank', 'noopener');
 });
-$('#submitReddit').addEventListener('click', openRedditDialog);
-$('#detail').addEventListener('click', (e) => { if (e.target.matches('[data-reddit]')) openRedditDialog(); });
+document.addEventListener('click', (e) => { if (e.target.closest('[data-reddit]')) openRedditDialog(); });
 
 let lastQ = '';
 function route() {
