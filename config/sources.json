@@ -1,0 +1,11 @@
+{
+  "_comment": "Only stores with a public, structured product feed. kind: 'discount' = full-bottle discounter, 'decant' = decant/sample shop. Shopify stores expose /products.json.",
+  "sources": [
+    { "id": "perfumania",     "name": "Perfumania",       "kind": "discount", "adapter": "shopify", "base": "https://perfumania.com" },
+    { "id": "beautyencounter","name": "Beauty Encounter", "kind": "discount", "adapter": "shopify", "base": "https://www.beautyencounter.com" },
+    { "id": "aura",           "name": "Aura Fragrance",   "kind": "discount", "adapter": "shopify", "base": "https://www.aurafragrance.com" },
+    { "id": "perfumebox",     "name": "The Perfume Box",  "kind": "discount", "adapter": "shopify", "base": "https://perfumebox.com" },
+    { "id": "decantx",        "name": "DecantX",          "kind": "decant",   "adapter": "shopify", "base": "https://decantx.com" },
+    { "id": "scentsplit",     "name": "ScentSplit",       "kind": "decant",   "adapter": "shopify", "base": "https://www.scentsplit.com" }
+  ]
+}

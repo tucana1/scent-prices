@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scent Prices</title>
+<meta name="description" content="Cheapest place to buy any perfume, full bottles and decants. No affiliate links.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='9' y='10' width='14' height='18' rx='3' fill='%238a5a44'/><rect x='13' y='4' width='6' height='6' rx='1' fill='%238a5a44'/></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <a href="#" class="logo">Scent<span>Prices</span></a>
+  <div class="search">
+    <input id="q" type="search" placeholder="Search a fragrance — e.g. sauvage edt, aventus, lattafa khamrah" autocomplete="off" autofocus>
+  </div>
+  <p class="meta" id="meta">Loading index…</p>
+</header>
+
+<main>
+  <ol id="results" class="results"></ol>
+  <section id="detail" class="detail" hidden></section>
+  <section id="empty" class="hint">
+    <p>Type a brand or fragrance name. Prices are pulled daily from discounters and decant shops, plus Reddit sale posts people submit.</p>
+    <p>No affiliate links, no sponsored placements. Click through and buy wherever is cheapest.</p>
+  </section>
+</main>
+
+<footer>
+  <button id="submitReddit" class="linkish">+ Submit a Reddit decant/sale post</button>
+  <span class="dot">·</span>
+  <span>Prices in USD, before shipping and tax. Always confirm on the store's page.</span>
+</footer>
+
+<dialog id="redditDlg">
+  <form method="dialog" id="redditForm">
+    <h2>Add a Reddit post</h2>
+    <p>Paste a link to a decant or sale post (e.g. r/fragranceswap, r/DecantHouse). Claude reads the prices and adds them to the matching fragrances. Posts expire after 60 days.</p>
+    <label>Post URL <input name="url" type="url" required placeholder="https://www.reddit.com/r/…/comments/…"></label>
+    <label>Price list text <small>(optional. Only needed if the prices are in an image or spreadsheet)</small>
+      <textarea name="text" rows="5"></textarea></label>
+    <p class="small">This opens a prefilled GitHub issue. The import runs once you submit it.</p>
+    <div class="row"><button value="cancel" formnovalidate>Cancel</button><button value="ok" class="primary">Continue to GitHub</button></div>
+  </form>
+</dialog>
+
+<script src="config.js"></script>
+<script src="app.js" type="module"></script>
+</body>
+</html>

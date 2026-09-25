@@ -1,0 +1,56 @@
+# Imports prices from a Reddit post submitted through the site (which opens an issue).
+# Runs automatically for issues opened by the repo owner/collaborators; anyone else's
+# submission waits until a maintainer adds the "approved" label (keeps API spend in your hands).
+name: Import Reddit post
+on:
+  issues:
+    types: [opened, labeled]
+
+permissions:
+  contents: write
+  issues: write
+  actions: write     # to kick off the site rebuild
+
+concurrency:
+  group: data
+  cancel-in-progress: false
+
+jobs:
+  import:
+    if: >-
+      startsWith(github.event.issue.title, 'Reddit prices:') &&
+      github.event.issue.state == 'open' &&
+      ((github.event.action == 'opened' &&
+        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association)) ||
+       (github.event.action == 'labeled' && github.event.label.name == 'approved'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci --omit=dev
+      - name: Extract prices with Claude
+        id: extract
+        continue-on-error: true
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
+          REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
+        run: node scripts/reddit-import.js
+      - name: Commit
+        if: steps.extract.outcome == 'success'
+        run: |
+          git config user.name "price-bot"
+          git config user.email "price-bot@users.noreply.github.com"
+          git add data/reddit.json
+          git commit -m "Reddit prices from issue #${{ github.event.issue.number }}"
+          git pull --rebase && git push
+          gh workflow run update.yml
+        env: { GH_TOKEN: '${{ github.token }}' }
+      - name: Report back on the issue
+        if: always()
+        env: { GH_TOKEN: '${{ github.token }}' }
+        run: |
+          gh issue comment ${{ github.event.issue.number }} --body-file build/reddit-summary.md
+          if [ "${{ steps.extract.outcome }}" = "success" ]; then gh issue close ${{ github.event.issue.number }}; fi

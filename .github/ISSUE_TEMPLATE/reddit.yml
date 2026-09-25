@@ -1,0 +1,14 @@
+name: Reddit prices
+description: Add prices from a Reddit decant split or sale post
+title: "Reddit prices: "
+labels: [reddit]
+body:
+  - type: input
+    attributes:
+      label: Reddit post URL
+      placeholder: https://www.reddit.com/r/fragranceswap/comments/...
+    validations: { required: true }
+  - type: textarea
+    attributes:
+      label: Price list text (optional)
+      description: Paste the price list if it's in an image or spreadsheet, or if the import can't read the post.

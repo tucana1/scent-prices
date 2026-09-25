@@ -1,0 +1,16 @@
+{
+  "name": "scent-prices",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "scrape": "node scripts/scrape.js",
+    "build": "node scripts/build.js",
+    "dev": "python3 -m http.server 8080 -d public"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.128.0"
+  }
+}

@@ -1,0 +1,39 @@
+# Daily: scrape every shop, merge Reddit posts, append price history, deploy to GitHub Pages.
+name: Update prices
+on:
+  schedule:
+    - cron: '17 9 * * *'   # daily, 09:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write   # commit data/history.json
+  pages: write
+  id-token: write
+
+concurrency:
+  group: data        # shared with reddit.yml so they never push at the same time
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node scripts/scrape.js
+      - run: node scripts/build.js
+      - name: Commit price history
+        run: |
+          git config user.name "price-bot"
+          git config user.email "price-bot@users.noreply.github.com"
+          git add data/history.json
+          git diff --cached --quiet || git commit -m "Price history $(date -u +%F)"
+          git pull --rebase && git push
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: public }
+      - id: deploy
+        uses: actions/deploy-pages@v4
