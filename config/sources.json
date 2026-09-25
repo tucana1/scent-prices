@@ -101,6 +101,13 @@
       "base": "https://www.scentrique.us"
     },
     {
+      "id": "scentsangel",
+      "name": "Scents Angel",
+      "kind": "mixed",
+      "adapter": "shopify",
+      "base": "https://www.scentsangel.com"
+    },
+    {
       "id": "decantx",
       "name": "DecantX",
       "kind": "decant",
@@ -228,6 +235,22 @@
       "kind": "decant",
       "adapter": "shopify",
       "base": "https://thefragrancesampleshop.com"
+    },
+    {
+      "id": "decantified",
+      "name": "Decantified",
+      "kind": "decant",
+      "adapter": "shopify",
+      "base": "https://decantified.com",
+      "brandFrom": "title"
+    },
+    {
+      "id": "scentsuave",
+      "name": "Scent Suave",
+      "kind": "decant",
+      "adapter": "shopify",
+      "base": "https://www.scentsuave.com",
+      "brandFrom": "title"
     }
   ]
 }
