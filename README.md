@@ -27,6 +27,7 @@ The site only reads stores that publish a structured product feed (Shopify's `/p
 
 | Store | Type |
 |---|---|
+| [MaxAroma](https://www.maxaroma.com) | discounter (rotating daily crawl) |
 | [Perfumania](https://perfumania.com) | discounter |
 | [Beauty Encounter](https://www.beautyencounter.com) | discounter |
 | [Aura Fragrance](https://www.aurafragrance.com) | discounter |
@@ -41,6 +42,7 @@ The site only reads stores that publish a structured product feed (Shopify's `/p
 | [Sensa Beauty](https://sensabeauty.com) | discounter |
 | [Fragrancelord](https://fragrancelord.com) | bottles + samples |
 | [Scentrique](https://www.scentrique.us) | bottles + samples |
+| [Scents Angel](https://www.scentsangel.com) | bottles + samples |
 | [DecantX](https://decantx.com) | decants |
 | [ScentSplit](https://www.scentsplit.com) | decants |
 | [Decants R Us](https://decantsrus.com) | decants |
@@ -59,11 +61,15 @@ The site only reads stores that publish a structured product feed (Shopify's `/p
 | [Decantalize](https://decantalize.com) | decants |
 | [Scent Decant](https://www.scentdecant.com) | decants |
 | [The Fragrance Sample Shop](https://thefragrancesampleshop.com) | decants |
+| [Decantified](https://decantified.com) | decants |
+| [Scent Suave](https://www.scentsuave.com) | decants |
 | Reddit posts (submitted) | decants + bottles, expire after 60 days |
 
 **Left out on purpose:**
 - **FragranceNet, FragranceX, Perfume.com, FragranceBuy, Venba and FragranceShop.com** block automated requests (403).
-- **Jomashop** loads prices with JavaScript from a private API. **MaxAroma** puts structured prices on each product page, but only for one size, across about 30k pages of ~700 KB. That would need a rotating crawl of part of the catalog per day. It's the best next candidate.
+- **Jomashop** loads prices with JavaScript from a private API.
+
+**MaxAroma** isn't on Shopify. Its product pages carry schema.org price data, one size per page, across about 18k fragrance pages. The `jsonld` adapter checks 1,200 of those pages a day, oldest first, so the whole catalog refreshes about every 15 days. Offers are carried forward for up to 21 days, and the site shows "price as of <date>" on anything older than 2 days. A product is skipped if its brand doesn't appear at any other shop, which is safer than guessing.
 - **Fragrance Outlet** has the same catalog as Perfumania. **FragranceUSA** lists almost everything as out of stock. **Aromatick** and **Decant & Discover** sell their own clones, or don't name the original brand.
 - **Non-USD shops** (Petit Parfums, Eurodecants, Fragrant World, Niche Perfume Decants, Prive Perfumes) are left out until the site handles currencies.
 - **Amazon, Walmart and eBay** are marketplaces with a high risk of fakes.

@@ -87,7 +87,9 @@ function sourceCell(o) {
   if (o.src === 'reddit') {
     return `<span class="src reddit">Reddit</span> <span class="sub">r/${esc(o.sub)} · u/${esc(o.by)} · ${esc(o.posted)}</span>${o.note ? `<div class="note">${esc(o.note)}</div>` : ''}`;
   }
-  return `<span class="src">${esc(s.name)}</span>${o.tester ? ' <span class="tag warn">tester</span>' : ''}${o.note ? ` <span class="tag">${esc(o.note)}</span>` : ''}`;
+  // Rotating-crawl shops (MaxAroma) carry prices forward; say how old they are.
+  const age = o.seen ? Math.floor((Date.now() - Date.parse(o.seen)) / 86400000) : 0;
+  return `<span class="src">${esc(s.name)}</span>${o.tester ? ' <span class="tag warn">tester</span>' : ''}${o.note ? ` <span class="tag">${esc(o.note)}</span>` : ''}${age > 2 ? ` <span class="sub">price as of ${esc(o.seen)}</span>` : ''}`;
 }
 
 async function showPerfume(id) {

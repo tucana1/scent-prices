@@ -1,6 +1,19 @@
 {
-  "_comment": "Only stores with a public, structured product feed. kind: 'discount' = full-bottle discounter, 'decant' = decant/sample shop, 'mixed' = sells both (small sizes count as decants only when labelled as samples). Shopify stores expose /products.json. brandFrom 'title' = the shop's vendor field is the shop itself, so the house is read from the product title.",
+  "_comment": "Only stores with a public, structured product feed. kind: 'discount' = full-bottle discounter, 'decant' = decant/sample shop, 'mixed' = sells both (small sizes count as decants only when labelled as samples). Shopify stores expose /products.json. brandFrom 'title' = the shop's vendor field is the shop itself, so the house is read from the product title. adapter 'jsonld' = sitemap + schema.org Product data on each page, refreshed in a rotating daily budget.",
   "sources": [
+    {
+      "id": "maxaroma",
+      "name": "MaxAroma",
+      "kind": "discount",
+      "adapter": "jsonld",
+      "base": "https://www.maxaroma.com",
+      "sitemap": "https://www.maxaroma.com/sitemap.xml",
+      "idPattern": "/pid/(\\d+)/",
+      "include": "^(fragrance/(?!.*gift-sets)|pocket-perfume/|vial/)",
+      "dailyBudget": 1200,
+      "maxAgeDays": 21,
+      "rps": 1
+    },
     {
       "id": "perfumania",
       "name": "Perfumania",

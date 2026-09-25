@@ -30,9 +30,12 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
       # Yesterday's offers stand in for any shop that fails today (see STALE_DAYS in scrape.js).
+      # MaxAroma's rotating crawl also needs to remember which pages it checked when.
       - uses: actions/cache@v4
         with:
-          path: build/offers.json
+          path: |
+            build/offers.json
+            build/jsonld-state.json
           key: offers-${{ github.run_id }}
           restore-keys: offers-
       - run: node scripts/scrape.js 2>&1 | tee scrape.log
@@ -46,6 +49,7 @@ jobs:
           name: scrape-${{ github.run_id }}
           path: |
             build/offers.json
+            build/jsonld-state.json
             scrape.log
           retention-days: 7
       - name: Commit price history
