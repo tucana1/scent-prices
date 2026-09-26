@@ -106,6 +106,8 @@ export function fragranceName(title, brand, vendor) {
   // Sizes go before punctuation is stripped, or "3.4 oz" leaves a stray "3" behind.
   let t = ' ' + words(String(title)
     .replace(/\([^)]*\)/g, ' ')
+    .replace(/(\d[a-z]+)([A-Z])/g, '$1 $2') // "9pmMen" -> "9pm Men"
+    .replace(/[-\s]DX\b/g, ' ') // DecantX's internal "-DX" listings
     .replace(/\b\d+(?:\s*\/\s*\d+)+\s*(ml|oz)\b/gi, ' ')
     .replace(/(^|[^\w.])\d*[.,]?\d+\s*(ml|oz|fl\.?\s*oz)\b\.?/gi, ' ')) + ' ';
   const brandForms = new Set([words(brand), words(vendor), words(vendor).replace(BRAND_SUFFIX, '')]);
