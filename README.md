@@ -38,9 +38,12 @@ Most shops are read from Shopify's public `/products.json` feed. Shops that aren
 | [MicroPerfumes](https://microperfumes.com) | decants | [Trustpilot 4.5★ · 11k reviews](https://www.trustpilot.com/review/microperfumes.com) |
 | [The Perfumed Court](https://theperfumedcourt.com) | decants | [Basenotes thread](https://basenotes.com/community/threads/perfume-court-are-they-legit.311708/) · [Fragrantica thread](https://www.fragrantica.com/board/viewtopic.php?id=143653) |
 | [Vintage Decants](https://vintagedecants.com) | decants | [Trustpilot 4.6★ · 44 reviews](https://www.trustpilot.com/review/vintagedecants.com) |
+| [Olena's Aroma Shop](https://olenasaromashop.com) | decants | [vouched by site owner](https://olenasaromashop.com) |
 | [Mystic Perfume](https://mysticperfume.com) | decants | [Trustpilot 4.8★ · 487 reviews](https://www.trustpilot.com/review/mysticperfume.com) |
+| [Discovery Decants](https://discoverydecants.com) | decants | [vouched by site owner](https://discoverydecants.com) |
 | [TryScents](https://tryscentsdecants.com) | decants | [Reddit: buyer review](https://www.reddit.com/r/fragranceclones/comments/1wdk6h4/freeze_in_flames_review/) |
 | [Dynasty Decants](https://www.dynastydecants.com) | decants | [Reddit: buyer recommends](https://www.reddit.com/r/fragranceclones/comments/1pyoytk/decant_drop_ranking_fierte_luna_liam_grey_aether/) |
+| [Decanted Clone](https://decantedclone.com) | decants | [vouched by site owner](https://decantedclone.com) |
 | [Parfum Exquis](https://parfumexquis.com) | decants | [Trustpilot 4.5★ · 15 reviews](https://www.trustpilot.com/review/parfumexquis.com) · [Basenotes thread](https://basenotes.com/threads/parfumexquis.537397/) |
 | [Decantalize](https://decantalize.com) | decants | [Reddit: buyer kudos](https://www.reddit.com/r/fragrance/comments/1ih2neh/decantalize_kudos/) |
 | [Scent Decant](https://www.scentdecant.com) | decants | [Trustpilot 4.6★ · 600 reviews](https://www.trustpilot.com/review/scentdecant.com) |
@@ -49,6 +52,7 @@ Most shops are read from Shopify's public `/products.json` feed. Shops that aren
 | [Scent Suave](https://www.scentsuave.com) | decants | [Reddit: buyer review](https://www.reddit.com/r/Colognes/comments/1nvaty2/tested_10_samples_of_very_popularhyped_fragrances/) |
 | [Decant House](https://www.decanthouse.com) | decants | [Trustpilot 4.9★ · 1.3k reviews](https://www.trustpilot.com/review/decanthouse.com) |
 | [Surrender to Chance](https://surrendertochance.com) | decants | [Basenotes thread](https://basenotes.com/threads/surrender-to-chance.461969/) · [Fragrantica thread](https://www.fragrantica.com/board/viewtopic.php?id=61017) |
+| [Project Frags](https://projectfrags.com) | decants | [vouched by site owner](https://projectfrags.com) |
 | [Decant & Discover](https://www.decantanddiscover.com) | decants | [vouched by site owner](https://decantanddiscover.com) |
 | [Venba Fragrance](https://www.venbafragrance.com) | bottles + samples | [Trustpilot 4.9★ · 5.5k reviews](https://www.trustpilot.com/review/venbafragrance.com) |
 | [Fragrancelord](https://fragrancelord.com) | bottles + samples | [Trustpilot 4.5★ · 1.4k reviews](https://www.trustpilot.com/review/fragrancelord.com) · [Fragrantica thread](https://www.fragrantica.com/board/viewtopic.php?id=282193) |
@@ -56,6 +60,7 @@ Most shops are read from Shopify's public `/products.json` feed. Shops that aren
 | [Scents Angel](https://www.scentsangel.com) | bottles + samples | [Trustpilot 4.2★ · 435 reviews](https://www.trustpilot.com/review/scentsangel.com) |
 | [Luckyscent](https://www.luckyscent.com) | bottles + samples | [Fragrantica thread](https://www.fragrantica.com/board/viewtopic.php?id=11261) · [Essencional profile](https://www.essencional.com/en/posts/luckyscent-americas-go-to-retailer-for-niche-perfumery/) |
 | [Aromatick](https://aromatick.com) | bottles + samples | [vouched by site owner](https://aromatick.com) |
+| [Rich and Luxe](https://www.richandluxe.com) | bottles + samples | [vouched by site owner](https://www.richandluxe.com) |
 | [MaxAroma](https://www.maxaroma.com) | discounter | — |
 | [Perfumania](https://perfumania.com) | discounter | — |
 | [Beauty Encounter](https://www.beautyencounter.com) | discounter | — |
@@ -73,12 +78,7 @@ Most shops are read from Shopify's public `/products.json` feed. Shops that aren
 
 **Vetting decant shops.** A decant shop is only scraped if `config/sources.json` lists evidence that someone independent vouches for it (`vouch`). At least one real buyer's Reddit post supporting the shop counts, as does a review profile with real volume, or the site owner's own vouch. The shop's own site, its own review widget, paid press releases and competitor listicles don't count. The evidence links appear next to each shop in the site's shop list. Reddit was searched through its public search feed, which covers posts but not comments. Shops on hold, with the reason (`vetting`):
 
-- **Rich and Luxe**: only a Reddit question with no visible answer; one Fragrantica thread
-- **Olena's Aroma Shop**: no Reddit posts found; reviews only in the shop's own review app
-- **Discovery Decants**: no Reddit posts found beyond the shop's own subreddit
-- **Decanted Clone**: no Reddit posts found
 - **Sample Scents**: no Reddit posts or reviews found (not the UK samplescents.co.uk)
-- **Project Frags**: no Reddit posts found; TikTok mentions only
 - **The Decantary**: no Reddit posts found; only paid press releases
 
 To reinstate one, add a `vouch` entry with the evidence.

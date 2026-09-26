@@ -212,7 +212,12 @@
       "kind": "mixed",
       "adapter": "shopify",
       "base": "https://www.richandluxe.com",
-      "vetting": "only a Reddit question with no visible answer; one Fragrantica thread"
+      "vouch": [
+        {
+          "label": "vouched by site owner",
+          "url": "https://www.richandluxe.com"
+        }
+      ]
     },
     {
       "id": "decantx",
@@ -319,7 +324,12 @@
       "kind": "decant",
       "adapter": "shopify",
       "base": "https://olenasaromashop.com",
-      "vetting": "no Reddit posts found; reviews only in the shop's own review app"
+      "vouch": [
+        {
+          "label": "vouched by site owner",
+          "url": "https://olenasaromashop.com"
+        }
+      ]
     },
     {
       "id": "mystic",
@@ -340,7 +350,12 @@
       "kind": "decant",
       "adapter": "shopify",
       "base": "https://discoverydecants.com",
-      "vetting": "no Reddit posts found beyond the shop's own subreddit"
+      "vouch": [
+        {
+          "label": "vouched by site owner",
+          "url": "https://discoverydecants.com"
+        }
+      ]
     },
     {
       "id": "tryscents",
@@ -374,7 +389,12 @@
       "kind": "decant",
       "adapter": "shopify",
       "base": "https://decantedclone.com",
-      "vetting": "no Reddit posts found"
+      "vouch": [
+        {
+          "label": "vouched by site owner",
+          "url": "https://decantedclone.com"
+        }
+      ]
     },
     {
       "id": "parfumexquis",
@@ -525,7 +545,12 @@
       "adapter": "shopify",
       "base": "https://projectfrags.com",
       "brandFrom": "title",
-      "vetting": "no Reddit posts found; TikTok mentions only"
+      "vouch": [
+        {
+          "label": "vouched by site owner",
+          "url": "https://projectfrags.com"
+        }
+      ]
     },
     {
       "id": "decantary",
