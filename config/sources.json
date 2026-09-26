@@ -1,5 +1,5 @@
 {
-  "_comment": "Only stores with a public, structured product feed. kind: 'discount' = full-bottle discounter, 'decant' = decant/sample shop, 'mixed' = sells both (small sizes count as decants only when labelled as samples). Shopify stores expose /products.json. brandFrom 'title' = the shop's vendor field is the shop itself, so the house is read from the product title. adapter 'sitemap' = product URLs from the sitemap, a rotating slice checked each day (pageFormat 'jsonld' reads schema.org data from the page; 'shopify-js' reads Shopify's per-product .js for shops that block the bulk feed).",
+  "_comment": "Only stores with a public, structured product feed. kind: 'discount' = full-bottle discounter, 'decant' = decant/sample shop, 'mixed' = sells both (small sizes count as decants only when labelled as samples). Shopify stores expose /products.json. brandFrom 'title' = the shop's vendor field is the shop itself, so the house is read from the product title. adapter 'sitemap' = product URLs from the sitemap, a rotating slice checked each day (pageFormat 'jsonld' reads schema.org data from the page; 'shopify-js' reads Shopify's per-product .js for shops that block the bulk feed). Decant/mixed shops need `vouch` (independent evidence: review profiles, community threads) to be scraped; `vetting` records why a shop is on hold.",
   "sources": [
     {
       "id": "maxaroma",
@@ -119,28 +119,51 @@
       "sitemapInclude": "sitemap_products",
       "idPattern": "/products/([^/?#.]+)",
       "dailyBudget": 900,
-      "maxAgeDays": 10
+      "maxAgeDays": 10,
+      "vouch": [
+        {
+          "label": "Trustpilot 4.9\u2605 \u00b7 5.5k reviews",
+          "url": "https://www.trustpilot.com/review/venbafragrance.com"
+        }
+      ]
     },
     {
       "id": "fragrancelord",
       "name": "Fragrancelord",
       "kind": "mixed",
       "adapter": "shopify",
-      "base": "https://fragrancelord.com"
+      "base": "https://fragrancelord.com",
+      "vouch": [
+        {
+          "label": "Trustpilot 4.5\u2605 \u00b7 1.4k reviews",
+          "url": "https://www.trustpilot.com/review/fragrancelord.com"
+        },
+        {
+          "label": "Fragrantica thread",
+          "url": "https://www.fragrantica.com/board/viewtopic.php?id=282193"
+        }
+      ]
     },
     {
       "id": "scentrique",
       "name": "Scentrique",
       "kind": "mixed",
       "adapter": "shopify",
-      "base": "https://www.scentrique.us"
+      "base": "https://www.scentrique.us",
+      "vetting": "weak: one Fragrantica mention, no review profile"
     },
     {
       "id": "scentsangel",
       "name": "Scents Angel",
       "kind": "mixed",
       "adapter": "shopify",
-      "base": "https://www.scentsangel.com"
+      "base": "https://www.scentsangel.com",
+      "vouch": [
+        {
+          "label": "Trustpilot 4.2\u2605 \u00b7 435 reviews",
+          "url": "https://www.trustpilot.com/review/scentsangel.com"
+        }
+      ]
     },
     {
       "id": "luckyscent",
@@ -153,119 +176,197 @@
       "sitemapInclude": "product",
       "idPattern": "/products/([^/?#]+)",
       "dailyBudget": 600,
-      "maxAgeDays": 10
+      "maxAgeDays": 10,
+      "vouch": [
+        {
+          "label": "Fragrantica thread",
+          "url": "https://www.fragrantica.com/board/viewtopic.php?id=11261"
+        },
+        {
+          "label": "Essencional profile",
+          "url": "https://www.essencional.com/en/posts/luckyscent-americas-go-to-retailer-for-niche-perfumery/"
+        }
+      ]
     },
     {
       "id": "aromatick",
       "name": "Aromatick",
       "kind": "mixed",
       "adapter": "shopify",
-      "base": "https://aromatick.com"
+      "base": "https://aromatick.com",
+      "vetting": "none: advertises 11,000+ Trustpilot reviews but no such profile exists"
     },
     {
       "id": "richandluxe",
       "name": "Rich and Luxe",
       "kind": "mixed",
       "adapter": "shopify",
-      "base": "https://www.richandluxe.com"
+      "base": "https://www.richandluxe.com",
+      "vetting": "weak: one Fragrantica thread, no review profile"
     },
     {
       "id": "decantx",
       "name": "DecantX",
       "kind": "decant",
       "adapter": "shopify",
-      "base": "https://decantx.com"
+      "base": "https://decantx.com",
+      "vouch": [
+        {
+          "label": "Trustpilot 4.5\u2605 \u00b7 2.1k reviews",
+          "url": "https://www.trustpilot.com/review/decantx.com"
+        }
+      ]
     },
     {
       "id": "scentsplit",
       "name": "ScentSplit",
       "kind": "decant",
       "adapter": "shopify",
-      "base": "https://www.scentsplit.com"
+      "base": "https://www.scentsplit.com",
+      "vouch": [
+        {
+          "label": "Trustpilot 4.7\u2605 \u00b7 16k reviews",
+          "url": "https://www.trustpilot.com/review/scentsplit.com"
+        },
+        {
+          "label": "Basenotes thread",
+          "url": "https://basenotes.com/threads/has-anyone-used-scentsplit-com-for-decants.419326/"
+        }
+      ]
     },
     {
       "id": "decantsrus",
       "name": "Decants R Us",
       "kind": "decant",
       "adapter": "shopify",
-      "base": "https://decantsrus.com"
+      "base": "https://decantsrus.com",
+      "vouch": [
+        {
+          "label": "Trustpilot 4.4\u2605 \u00b7 108 reviews",
+          "url": "https://www.trustpilot.com/review/decantsrus.com"
+        }
+      ]
     },
     {
       "id": "fragrancesline",
       "name": "Fragrances Line",
       "kind": "decant",
       "adapter": "shopify",
-      "base": "https://fragrancesline.com"
+      "base": "https://fragrancesline.com",
+      "vetting": "weak: Trustpilot 3.0 from 4 reviews; BBB 4 reviews"
     },
     {
       "id": "microperfumes",
       "name": "MicroPerfumes",
       "kind": "decant",
       "adapter": "shopify",
-      "base": "https://microperfumes.com"
+      "base": "https://microperfumes.com",
+      "vouch": [
+        {
+          "label": "Trustpilot 4.5\u2605 \u00b7 11k reviews",
+          "url": "https://www.trustpilot.com/review/microperfumes.com"
+        }
+      ]
     },
     {
       "id": "perfumedcourt",
       "name": "The Perfumed Court",
       "kind": "decant",
       "adapter": "shopify",
-      "base": "https://theperfumedcourt.com"
+      "base": "https://theperfumedcourt.com",
+      "vouch": [
+        {
+          "label": "Basenotes thread",
+          "url": "https://basenotes.com/community/threads/perfume-court-are-they-legit.311708/"
+        },
+        {
+          "label": "Fragrantica thread",
+          "url": "https://www.fragrantica.com/board/viewtopic.php?id=143653"
+        }
+      ]
     },
     {
       "id": "vintagedecants",
       "name": "Vintage Decants",
       "kind": "decant",
       "adapter": "shopify",
-      "base": "https://vintagedecants.com"
+      "base": "https://vintagedecants.com",
+      "vouch": [
+        {
+          "label": "Trustpilot 4.6\u2605 \u00b7 44 reviews",
+          "url": "https://www.trustpilot.com/review/vintagedecants.com"
+        }
+      ]
     },
     {
       "id": "olenas",
       "name": "Olena's Aroma Shop",
       "kind": "decant",
       "adapter": "shopify",
-      "base": "https://olenasaromashop.com"
+      "base": "https://olenasaromashop.com",
+      "vetting": "weak: only the shop's own review app and 6 Facebook reviews"
     },
     {
       "id": "mystic",
       "name": "Mystic Perfume",
       "kind": "decant",
       "adapter": "shopify",
-      "base": "https://mysticperfume.com"
+      "base": "https://mysticperfume.com",
+      "vouch": [
+        {
+          "label": "Trustpilot 4.8\u2605 \u00b7 487 reviews",
+          "url": "https://www.trustpilot.com/review/mysticperfume.com"
+        }
+      ]
     },
     {
       "id": "discoverydecants",
       "name": "Discovery Decants",
       "kind": "decant",
       "adapter": "shopify",
-      "base": "https://discoverydecants.com"
+      "base": "https://discoverydecants.com",
+      "vetting": "none: no independent reviews or mentions"
     },
     {
       "id": "tryscents",
       "name": "TryScents",
       "kind": "decant",
       "adapter": "shopify",
-      "base": "https://tryscentsdecants.com"
+      "base": "https://tryscentsdecants.com",
+      "vetting": "none: one 1-star Trustpilot review; implausible on-site review count for its age"
     },
     {
       "id": "dynasty",
       "name": "Dynasty Decants",
       "kind": "decant",
       "adapter": "shopify",
-      "base": "https://www.dynastydecants.com"
+      "base": "https://www.dynastydecants.com",
+      "vetting": "none: pays $10 for Reddit reviews; no independent reviews"
     },
     {
       "id": "decantedclone",
       "name": "Decanted Clone",
       "kind": "decant",
       "adapter": "shopify",
-      "base": "https://decantedclone.com"
+      "base": "https://decantedclone.com",
+      "vetting": "none: no independent reviews"
     },
     {
       "id": "parfumexquis",
       "name": "Parfum Exquis",
       "kind": "decant",
       "adapter": "shopify",
-      "base": "https://parfumexquis.com"
+      "base": "https://parfumexquis.com",
+      "vouch": [
+        {
+          "label": "Trustpilot 4.5\u2605 \u00b7 15 reviews",
+          "url": "https://www.trustpilot.com/review/parfumexquis.com"
+        },
+        {
+          "label": "Basenotes thread",
+          "url": "https://basenotes.com/threads/parfumexquis.537397/"
+        }
+      ]
     },
     {
       "id": "samplescents",
@@ -273,7 +374,8 @@
       "kind": "decant",
       "adapter": "shopify",
       "base": "https://samplescents.com",
-      "brandFrom": "title"
+      "brandFrom": "title",
+      "vetting": "none: no independent reviews (not the UK samplescents.co.uk)"
     },
     {
       "id": "decantalize",
@@ -281,7 +383,8 @@
       "kind": "decant",
       "adapter": "shopify",
       "base": "https://decantalize.com",
-      "brandFrom": "title"
+      "brandFrom": "title",
+      "vetting": "weak: 2 Trustpilot reviews"
     },
     {
       "id": "scentdecant",
@@ -289,14 +392,26 @@
       "kind": "decant",
       "adapter": "shopify",
       "base": "https://www.scentdecant.com",
-      "brandFrom": "title"
+      "brandFrom": "title",
+      "vouch": [
+        {
+          "label": "Trustpilot 4.6\u2605 \u00b7 600 reviews",
+          "url": "https://www.trustpilot.com/review/scentdecant.com"
+        }
+      ]
     },
     {
       "id": "samplesshop",
       "name": "The Fragrance Sample Shop",
       "kind": "decant",
       "adapter": "shopify",
-      "base": "https://thefragrancesampleshop.com"
+      "base": "https://thefragrancesampleshop.com",
+      "vouch": [
+        {
+          "label": "Trustpilot 4.9\u2605 \u00b7 99 reviews",
+          "url": "https://www.trustpilot.com/review/www.thefragrancesampleshop.com"
+        }
+      ]
     },
     {
       "id": "decantified",
@@ -304,7 +419,8 @@
       "kind": "decant",
       "adapter": "shopify",
       "base": "https://decantified.com",
-      "brandFrom": "title"
+      "brandFrom": "title",
+      "vetting": "weak: 11-month-old domain, reviews only on its own site, flagged by a malware scanner"
     },
     {
       "id": "scentsuave",
@@ -312,7 +428,8 @@
       "kind": "decant",
       "adapter": "shopify",
       "base": "https://www.scentsuave.com",
-      "brandFrom": "title"
+      "brandFrom": "title",
+      "vetting": "none: 1-year-old domain, no reviews anywhere"
     },
     {
       "id": "decanthouse",
@@ -327,7 +444,13 @@
       "maxAgeDays": 10,
       "allSizes": true,
       "rps": 1.5,
-      "minSeen": "2026-09-26"
+      "minSeen": "2026-09-26",
+      "vouch": [
+        {
+          "label": "Trustpilot 4.9\u2605 \u00b7 1.3k reviews",
+          "url": "https://www.trustpilot.com/review/decanthouse.com"
+        }
+      ]
     },
     {
       "id": "surrendertochance",
@@ -343,7 +466,17 @@
       "maxAgeDays": 21,
       "allSizes": true,
       "rps": 2,
-      "minSeen": "2026-09-26"
+      "minSeen": "2026-09-26",
+      "vouch": [
+        {
+          "label": "Basenotes thread",
+          "url": "https://basenotes.com/threads/surrender-to-chance.461969/"
+        },
+        {
+          "label": "Fragrantica thread",
+          "url": "https://www.fragrantica.com/board/viewtopic.php?id=61017"
+        }
+      ]
     },
     {
       "id": "projectfrags",
@@ -351,14 +484,16 @@
       "kind": "decant",
       "adapter": "shopify",
       "base": "https://projectfrags.com",
-      "brandFrom": "title"
+      "brandFrom": "title",
+      "vetting": "weak: TikTok mentions only, no review profile"
     },
     {
       "id": "decantary",
       "name": "The Decantary",
       "kind": "decant",
       "adapter": "shopify",
-      "base": "https://thedecantary.net"
+      "base": "https://thedecantary.net",
+      "vetting": "none: only paid press releases"
     }
   ]
 }

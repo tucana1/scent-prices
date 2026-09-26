@@ -344,7 +344,11 @@ const ADAPTERS = {
 
 const { sources } = JSON.parse(await readFile(new URL('../config/sources.json', import.meta.url)));
 const only = process.argv.slice(2);
-const picked = sources.filter((s) => !only.length || only.includes(s.id));
+// Decant shops are only listed with independent evidence that real buyers vouch for them
+// (`vouch` in config/sources.json: review profiles, community threads).
+const unvetted = sources.filter((s) => s.kind !== 'discount' && !s.vouch?.length);
+if (unvetted.length) console.log(`skipping unvetted decant shops: ${unvetted.map((s) => s.id).join(', ')}`);
+const picked = sources.filter((s) => (!only.length || only.includes(s.id)) && !unvetted.includes(s));
 
 // Last run's offers (cached between CI runs) stand in for a source that fails today.
 let previous = [];

@@ -125,7 +125,7 @@ dialog button.primary { background: var(--accent); border-color: var(--accent); 
 .shops { list-style: none; margin: 0; padding: 0; max-height: 40vh; overflow-y: auto; border: 1px solid var(--line); border-radius: 8px; }
 .shops li { display: flex; justify-content: space-between; gap: 8px; padding: 7px 10px; border-top: 1px solid var(--line); font-size: 14px; }
 .shops li:first-child { border-top: 0; }
-.shops li a { color: var(--accent); font-weight: 600; text-decoration: none; margin-right: auto; }
+.shops li > a:first-child { color: var(--accent); font-weight: 600; text-decoration: none; }
 @media (max-width: 520px) { .tagline { display: none; } }
 .popular-head { display: flex; justify-content: space-between; align-items: baseline; margin-top: 22px; }
 .popular-head h2 { font-size: 15px; margin: 0; color: var(--ink); }
@@ -140,3 +140,6 @@ dialog button.primary { background: var(--accent); border-color: var(--accent); 
 .chip:hover:not(:disabled) { border-color: var(--accent); }
 .chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
 .chip:disabled { opacity: .4; cursor: default; }
+.vouch { font-size: 12px; margin-right: auto; }
+.shops li a.vouch-link, .vouch a { color: var(--dim); font-weight: 500; text-decoration: underline; text-underline-offset: 2px; }
+.shops li > a:first-child { margin-right: 6px; }

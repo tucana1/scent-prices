@@ -29,53 +29,58 @@ GitHub Actions (daily, free)                     GitHub Pages (free, static)
 
 Most shops are read from Shopify's public `/products.json` feed. Shops that aren't on Shopify, or that turn that feed off, are read from their sitemap plus each product page (the `sitemap` adapter, a rotating slice per day, see below). Nothing gets around bot protection: sites that answer with Cloudflare challenges or "bot protection" errors are left out, and robots.txt is respected. Shopify rate-limits per IP across all its stores, so the scraper shares one budget (1 request/sec) across every store and pauses everything on a 429. A full crawl takes about 10 minutes on GitHub Actions. If a shop fails, its offers from the last run (up to 3 days old) are reused.
 
-| Store | Type |
-|---|---|
-| [DecantX](https://decantx.com) | decants |
-| [ScentSplit](https://www.scentsplit.com) | decants |
-| [Decants R Us](https://decantsrus.com) | decants |
-| [Fragrances Line](https://fragrancesline.com) | decants |
-| [MicroPerfumes](https://microperfumes.com) | decants |
-| [The Perfumed Court](https://theperfumedcourt.com) | decants |
-| [Vintage Decants](https://vintagedecants.com) | decants |
-| [Olena's Aroma Shop](https://olenasaromashop.com) | decants |
-| [Mystic Perfume](https://mysticperfume.com) | decants |
-| [Discovery Decants](https://discoverydecants.com) | decants |
-| [TryScents](https://tryscentsdecants.com) | decants |
-| [Dynasty Decants](https://www.dynastydecants.com) | decants |
-| [Decanted Clone](https://decantedclone.com) | decants |
-| [Parfum Exquis](https://parfumexquis.com) | decants |
-| [Sample Scents](https://samplescents.com) | decants |
-| [Decantalize](https://decantalize.com) | decants |
-| [Scent Decant](https://www.scentdecant.com) | decants |
-| [The Fragrance Sample Shop](https://thefragrancesampleshop.com) | decants |
-| [Decantified](https://decantified.com) | decants |
-| [Scent Suave](https://www.scentsuave.com) | decants |
-| [Decant House](https://www.decanthouse.com) | decants (rotating crawl, every size) |
-| [Surrender to Chance](https://surrendertochance.com) | decants (rotating crawl, every size) |
-| [Project Frags](https://projectfrags.com) | decants |
-| [The Decantary](https://thedecantary.net) | decants |
-| [Venba Fragrance](https://www.venbafragrance.com) | bottles + samples (rotating crawl, per-product Shopify data) |
-| [Fragrancelord](https://fragrancelord.com) | bottles + samples |
-| [Scentrique](https://www.scentrique.us) | bottles + samples |
-| [Scents Angel](https://www.scentsangel.com) | bottles + samples |
-| [Luckyscent](https://www.luckyscent.com) | bottles + samples (rotating crawl, schema.org page data) |
-| [Aromatick](https://aromatick.com) | bottles + samples |
-| [Rich and Luxe](https://www.richandluxe.com) | bottles + samples |
-| [MaxAroma](https://www.maxaroma.com) | discounter (rotating crawl, schema.org page data) |
-| [Perfumania](https://perfumania.com) | discounter |
-| [Beauty Encounter](https://www.beautyencounter.com) | discounter |
-| [Aura Fragrance](https://www.aurafragrance.com) | discounter |
-| [The Perfume Box](https://perfumebox.com) | discounter |
-| [The Perfume Shop USA](https://theperfumeshopusa.com) | discounter |
-| [FragFlex](https://fragflex.com) | discounter |
-| [Lattafa USA (official)](https://lattafa-usa.com) | discounter |
-| [Fragrance Nevaeh](https://fragrance-nevaeh.com) | discounter |
-| [Fragrance Wholesale](https://fragrancewholesale.com) | discounter |
-| [Luxury Perfume](https://luxuryperfume.com) | discounter |
-| [Perfumes LA](https://perfumes.la/en-us) | discounter |
-| [Sensa Beauty](https://sensabeauty.com) | discounter |
-| Reddit posts (submitted) | decants + bottles, expire after 60 days |
+| Store | Type | Who vouches for it |
+|---|---|---|
+| [DecantX](https://decantx.com) | decants | [Trustpilot 4.5★ · 2.1k reviews](https://www.trustpilot.com/review/decantx.com) |
+| [ScentSplit](https://www.scentsplit.com) | decants | [Trustpilot 4.7★ · 16k reviews](https://www.trustpilot.com/review/scentsplit.com) · [Basenotes thread](https://basenotes.com/threads/has-anyone-used-scentsplit-com-for-decants.419326/) |
+| [Decants R Us](https://decantsrus.com) | decants | [Trustpilot 4.4★ · 108 reviews](https://www.trustpilot.com/review/decantsrus.com) |
+| [MicroPerfumes](https://microperfumes.com) | decants | [Trustpilot 4.5★ · 11k reviews](https://www.trustpilot.com/review/microperfumes.com) |
+| [The Perfumed Court](https://theperfumedcourt.com) | decants | [Basenotes thread](https://basenotes.com/community/threads/perfume-court-are-they-legit.311708/) · [Fragrantica thread](https://www.fragrantica.com/board/viewtopic.php?id=143653) |
+| [Vintage Decants](https://vintagedecants.com) | decants | [Trustpilot 4.6★ · 44 reviews](https://www.trustpilot.com/review/vintagedecants.com) |
+| [Mystic Perfume](https://mysticperfume.com) | decants | [Trustpilot 4.8★ · 487 reviews](https://www.trustpilot.com/review/mysticperfume.com) |
+| [Parfum Exquis](https://parfumexquis.com) | decants | [Trustpilot 4.5★ · 15 reviews](https://www.trustpilot.com/review/parfumexquis.com) · [Basenotes thread](https://basenotes.com/threads/parfumexquis.537397/) |
+| [Scent Decant](https://www.scentdecant.com) | decants | [Trustpilot 4.6★ · 600 reviews](https://www.trustpilot.com/review/scentdecant.com) |
+| [The Fragrance Sample Shop](https://thefragrancesampleshop.com) | decants | [Trustpilot 4.9★ · 99 reviews](https://www.trustpilot.com/review/www.thefragrancesampleshop.com) |
+| [Decant House](https://www.decanthouse.com) | decants | [Trustpilot 4.9★ · 1.3k reviews](https://www.trustpilot.com/review/decanthouse.com) |
+| [Surrender to Chance](https://surrendertochance.com) | decants | [Basenotes thread](https://basenotes.com/threads/surrender-to-chance.461969/) · [Fragrantica thread](https://www.fragrantica.com/board/viewtopic.php?id=61017) |
+| [Venba Fragrance](https://www.venbafragrance.com) | bottles + samples | [Trustpilot 4.9★ · 5.5k reviews](https://www.trustpilot.com/review/venbafragrance.com) |
+| [Fragrancelord](https://fragrancelord.com) | bottles + samples | [Trustpilot 4.5★ · 1.4k reviews](https://www.trustpilot.com/review/fragrancelord.com) · [Fragrantica thread](https://www.fragrantica.com/board/viewtopic.php?id=282193) |
+| [Scents Angel](https://www.scentsangel.com) | bottles + samples | [Trustpilot 4.2★ · 435 reviews](https://www.trustpilot.com/review/scentsangel.com) |
+| [Luckyscent](https://www.luckyscent.com) | bottles + samples | [Fragrantica thread](https://www.fragrantica.com/board/viewtopic.php?id=11261) · [Essencional profile](https://www.essencional.com/en/posts/luckyscent-americas-go-to-retailer-for-niche-perfumery/) |
+| [MaxAroma](https://www.maxaroma.com) | discounter | — |
+| [Perfumania](https://perfumania.com) | discounter | — |
+| [Beauty Encounter](https://www.beautyencounter.com) | discounter | — |
+| [Aura Fragrance](https://www.aurafragrance.com) | discounter | — |
+| [The Perfume Box](https://perfumebox.com) | discounter | — |
+| [The Perfume Shop USA](https://theperfumeshopusa.com) | discounter | — |
+| [FragFlex](https://fragflex.com) | discounter | — |
+| [Lattafa USA (official)](https://lattafa-usa.com) | discounter | — |
+| [Fragrance Nevaeh](https://fragrance-nevaeh.com) | discounter | — |
+| [Fragrance Wholesale](https://fragrancewholesale.com) | discounter | — |
+| [Luxury Perfume](https://luxuryperfume.com) | discounter | — |
+| [Perfumes LA](https://perfumes.la/en-us) | discounter | — |
+| [Sensa Beauty](https://sensabeauty.com) | discounter | — |
+| Reddit posts (submitted) | decants + bottles, expire after 60 days | — |
+
+**Vetting decant shops.** A decant shop is only scraped if `config/sources.json` lists independent evidence that real buyers vouch for it (`vouch`): a review profile with meaningful volume, or community threads from actual buyers. The shop's own site, its own review widget, paid press releases and competitor listicles don't count. The evidence links appear next to each shop in the site's shop list. Shops on hold, with the reason (`vetting`):
+
+- **Scentrique**: weak: one Fragrantica mention, no review profile
+- **Aromatick**: none: advertises 11,000+ Trustpilot reviews but no such profile exists
+- **Rich and Luxe**: weak: one Fragrantica thread, no review profile
+- **Fragrances Line**: weak: Trustpilot 3.0 from 4 reviews; BBB 4 reviews
+- **Olena's Aroma Shop**: weak: only the shop's own review app and 6 Facebook reviews
+- **Discovery Decants**: none: no independent reviews or mentions
+- **TryScents**: none: one 1-star Trustpilot review; implausible on-site review count for its age
+- **Dynasty Decants**: none: pays $10 for Reddit reviews; no independent reviews
+- **Decanted Clone**: none: no independent reviews
+- **Sample Scents**: none: no independent reviews (not the UK samplescents.co.uk)
+- **Decantalize**: weak: 2 Trustpilot reviews
+- **Decantified**: weak: 11-month-old domain, reviews only on its own site, flagged by a malware scanner
+- **Scent Suave**: none: 1-year-old domain, no reviews anywhere
+- **Project Frags**: weak: TikTok mentions only, no review profile
+- **The Decantary**: none: only paid press releases
+
+To reinstate one, add a `vouch` entry with the evidence.
 
 **Left out on purpose:**
 - **FragranceNet, FragranceX, Perfume.com, FragranceBuy, FragranceShop.com, The Fragrance Decant Boutique and Decant Store** block automated requests (403 or Cloudflare challenges). The legitimate route to the big discounters is their affiliate data feeds (CJ, Rakuten, Impact); you don't have to use the referral links.

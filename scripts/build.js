@@ -167,7 +167,11 @@ for (const [id, p] of perfumes) for (const o of p.offers.values()) {
   if (!perSource.has(o.src)) perSource.set(o.src, new Set());
   perSource.get(o.src).add(id);
 }
-const srcMeta = Object.fromEntries(sources.map((s) => [s.id, { name: s.name, kind: s.kind, url: s.base, n: perSource.get(s.id)?.size || 0 }]));
+const listed = sources.filter((s) => s.kind === 'discount' || s.vouch?.length);
+const srcMeta = Object.fromEntries(listed.map((s) => [s.id, {
+  name: s.name, kind: s.kind, url: s.base, n: perSource.get(s.id)?.size || 0,
+  vouch: s.vouch?.map((v) => ({ url: v.url, label: v.label })),
+}]));
 srcMeta.reddit = { name: 'Reddit', kind: 'reddit' };
 await writeFile(new URL('index.json', out), JSON.stringify({ updated: scraped.scrapedAt || new Date().toISOString(), sources: srcMeta, brands, rows }));
 await Promise.all(shards.map((s, i) => writeFile(new URL(`p/${i.toString(16).padStart(2, '0')}.json`, out), JSON.stringify(s))));

@@ -104,8 +104,8 @@ function openShops(first) {
   $('#shopsList').innerHTML = groups.map(([, title, test]) => {
     const list = Object.values(index.sources).filter((s) => test(s.kind)).sort((a, b) => (b.n || 0) - (a.n || 0) || a.name.localeCompare(b.name));
     return `<h2>${title} <span class="dim">(${list.length})</span></h2>
-      <ul class="shops">${list.map((s) => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener nofollow">${esc(s.name)}</a>${s.kind === 'mixed' ? ' <span class="tag">bottles + samples</span>' : ''}${s.n ? `<span class="dim">${s.n.toLocaleString()} fragrances</span>` : ''}</li>`).join('')}</ul>`;
-  }).join('') + `<p class="small dim">Plus Reddit decant splits and sales that people submit. Shops are added when they publish a public product feed, so there's no scraping around bot protection.</p>`;
+      <ul class="shops">${list.map((s) => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener nofollow">${esc(s.name)}</a>${s.kind === 'mixed' ? ' <span class="tag">bottles + samples</span>' : ''}${s.vouch?.length ? ` <span class="vouch">${s.vouch.map((v) => `<a href="${esc(v.url)}" target="_blank" rel="noopener nofollow" title="Independent reviews">${esc(v.label)}</a>`).join(' · ')}</span>` : ''}${s.n ? `<span class="dim">${s.n.toLocaleString()} fragrances</span>` : ''}</li>`).join('')}</ul>`;
+  }).join('') + `<p class="small dim">Plus Reddit decant splits and sales that people submit. Decant shops are only listed when independent buyers vouch for them; the links next to each name are that evidence.</p>`;
   $('#shopsDlg').showModal();
 }
 
