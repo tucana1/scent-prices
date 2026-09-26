@@ -143,3 +143,8 @@ dialog button.primary { background: var(--accent); border-color: var(--accent); 
 .vouch { font-size: 12px; margin-right: auto; }
 .shops li a.vouch-link, .vouch a { color: var(--dim); font-weight: 500; text-decoration: underline; text-underline-offset: 2px; }
 .shops li > a:first-child { margin-right: 6px; }
+.tag.sib { background: transparent; color: var(--dim); border: 1px solid var(--line); font-weight: 500; }
+.conc-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 4px; }
+.conc-tabs .chip { text-decoration: none; }
+.conc-tabs .chip small { opacity: .75; margin-left: 2px; }
+.conc-tabs .chip.on small { opacity: .9; }

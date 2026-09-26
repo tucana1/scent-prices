@@ -7,7 +7,7 @@
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import {
-  canonicalBrand, concentration, sizeMl, isTester, isNotPerfume, fragranceName, perfumeId, brandFromTitle, words,
+  canonicalBrand, concentration, sizeMl, isTester, isNotPerfume, fragranceName, perfumeId, brandFromTitle, words, brandKey,
 } from './lib/normalize.js';
 
 const UA = 'PerfumePriceIndex/1.0 (+non-commercial price comparison; polite crawler)';
@@ -144,7 +144,9 @@ const PAGE_PARSERS = {
     const ld = ldProduct(html);
     if (!ld) return [];
     const brand = (typeof ld.brand === 'object' ? ld.brand?.name : ld.brand) ||
-      html.match(/aria-label="Brand: ([^"]+)"/)?.[1]; // MaxAroma keeps the house in its spec table
+      // MaxAroma names the house in the product heading. (Its "Brand: X" labels are the site's
+      // alphabetical brand menu, whose first entry "27 87" was once read as every product's brand.)
+      decodeHtml(html.match(/<h1 id="product-main-title">\s*<a[^>]*>([^<]+)<\/a>/)?.[1] || '') || undefined;
     const desc = String(ld.description || '').slice(0, 300);
     if (ld['@type'] === 'ProductGroup') {
       return (ld.hasVariant || []).map((v) => {
@@ -347,13 +349,17 @@ const ADAPTERS = {
         continue;
       }
       // Title-branded shops are resolved after the others finish, against every brand seen.
-      if (src.brandFrom === 'title') products.push({ title: p.title, product_type: p.product_type, handle: p.handle, variants: p.variants });
+      // Some shops put their own name in the vendor field on part of the catalog (DecantX:
+      // "Decantx Perfume Cologne Decant Fragrance Samples"); those get the title treatment too.
+      const vendorIsShop = /decant|samples/i.test(p.vendor || '') || brandKey(p.vendor || '').includes(brandKey(src.name));
+      if (src.brandFrom === 'title' || vendorIsShop) products.push({ title: p.title, product_type: p.product_type, handle: p.handle, variants: p.variants });
       else offers.push(...offersFromShopify(src, p));
     }
-    if (src.brandFrom !== 'title') return { offers, scanned: n };
+    if (!products.length) return { offers, scanned: n };
+    const titled = { ...src, brandFrom: 'title' };
     return {
       offers: [], scanned: n, deferred: true,
-      resolve: (knownBrands) => products.flatMap((p) => offersFromShopify(src, p, knownBrands)),
+      resolve: (knownBrands) => [...offers, ...products.flatMap((p) => offersFromShopify(titled, p, knownBrands))],
     };
   },
 };

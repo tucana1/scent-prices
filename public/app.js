@@ -31,6 +31,16 @@ function renderSizeChips() {
 function setSize(k) {
   sizePref = k;
   try { localStorage.setItem('decantSize', k); } catch {}
+  // One fragrance can come in several concentrations (Sauvage EDT / EDP / Parfum, plus listings that
+  // don't say). Search shows one row per fragrance; the page has a tab per concentration.
+  groups = new Map();
+  for (const it of items) {
+    it.groupKey = it.id.replace(/--(edp|edt|edc|parfum|extrait)$/, '');
+    if (!groups.has(it.groupKey)) groups.set(it.groupKey, []);
+    groups.get(it.groupKey).push(it);
+  }
+  const concOrder = ['EDT', 'EDP', 'Parfum', 'Extrait', 'EDC', ''];
+  for (const g of groups.values()) g.sort((a, b) => concOrder.indexOf(a.conc) - concOrder.indexOf(b.conc));
   renderSizeChips();
   renderPopularPreview();
   route();
@@ -42,7 +52,7 @@ function decantHeadline(it) {
   return v ? [v, false] : null;
 }
 
-let index, items = [];
+let index, items = [], groups = new Map();
 const shardCache = new Map();
 
 function shardOf(id) {
@@ -55,20 +65,33 @@ async function loadIndex() {
   index = await fetch('data/index.json').then((r) => r.json());
   items = index.rows.map(([b, name, conc, minBottle, minBottleMl, minDecant, n, nShops = 0, nDecantShops = 0, sizeMins = []]) => {
     const brand = index.brands[b];
-    const id = [slug(brand), slug(name), conc ? conc.toLowerCase() : ''].filter(Boolean).join('--');
-    return { id, brand, name, conc, minBottle, minBottleMl, minDecant, n, nShops, nDecantShops, sizeMins, hay: ` ${words(`${brand} ${name} ${conc} ${CONC[conc] || ''}`)} `, brandW: words(brand) };
+    const id = [slug(brand), slug(name).replace(/-/g, ''), conc ? conc.toLowerCase() : ''].filter(Boolean).join('--');
+    return { id, brand, name, conc, minBottle, minBottleMl, minDecant, n, nShops, nDecantShops, sizeMins,
+      squashed: words(`${brand} ${name}`).replace(/ /g, ''), hay: ` ${words(`${brand} ${name} ${conc} ${CONC[conc] || ''}`)} `, brandW: words(brand) };
   });
   const age = Math.round((Date.now() - Date.parse(index.updated)) / 3600000);
   const shops = Object.values(index.sources);
   const nDisc = shops.filter((s) => s.kind === 'discount').length;
   const nDecant = shops.filter((s) => s.kind === 'decant' || s.kind === 'mixed').length;
+  // One fragrance can come in several concentrations (Sauvage EDT / EDP / Parfum, plus listings that
+  // don't say). Search shows one row per fragrance; the page has a tab per concentration.
+  groups = new Map();
+  for (const it of items) {
+    it.groupKey = it.id.replace(/--(edp|edt|edc|parfum|extrait)$/, '');
+    if (!groups.has(it.groupKey)) groups.set(it.groupKey, []);
+    groups.get(it.groupKey).push(it);
+  }
+  const concOrder = ['EDT', 'EDP', 'Parfum', 'Extrait', 'EDC', ''];
+  for (const g of groups.values()) g.sort((a, b) => concOrder.indexOf(a.conc) - concOrder.indexOf(b.conc));
   renderSizeChips();
   renderPopularPreview();
   $('#meta').innerHTML = `${items.length.toLocaleString()} fragrances · <button class="linkish" data-shops="decant">${nDecant} decant shops</button> · <button class="linkish" data-shops="discount">${nDisc} discounters</button> + Reddit · updated ${age < 1 ? 'just now' : `${age}h ago`}`;
 }
 
 function renderPopularPreview() {
-  $('#popular').innerHTML = items.filter((it) => decantHeadline(it)).slice(0, 12).map((it) => resultRow(it)).join('');
+  const seen = new Set();
+  $('#popular').innerHTML = items.filter((it) => decantHeadline(it) && !seen.has(it.groupKey) && seen.add(it.groupKey))
+    .slice(0, 12).map((it) => resultRow(it)).join('');
 }
 
 function search(q) {
@@ -85,13 +108,17 @@ function search(q) {
       if (i < 0) { ok = false; break; }
       score += it.hay.startsWith(t + ' ', i + 1) ? 3 : 1; // whole word beats prefix
     }
+    // Spacing differs between shops ("Torino 21" / "Torino21"): fall back to comparing without spaces.
+    if (!ok && it.squashed.includes(toks.join(''))) { ok = true; score = toks.length; }
     if (!ok) continue;
     if (toks.join(' ') === it.brandW) score -= 1; // pure brand query: keep popularity order
     // Decant comparison first: among equally good matches, ones with decants rank higher.
     out.push([score * 1000 + (decantHeadline(it) ? 500 : 0) + Math.min(it.n, 499), it]);
     if (out.length > 3000) break;
   }
-  return out.sort((a, b) => b[0] - a[0]).slice(0, 40).map((x) => x[1]);
+  const seen = new Set();
+  return out.sort((a, b) => b[0] - a[0]).map((x) => x[1])
+    .filter((it) => !seen.has(it.groupKey) && seen.add(it.groupKey)).slice(0, 40);
 }
 
 // Which shops we track: opened from the counts under the search box.
@@ -117,10 +144,17 @@ function decantLine(it) {
   return h[1] ? `decants from <b>${money(h[0])}/ml</b>${shops}` : `${label} from <b>${money(h[0])}</b>`;
 }
 
+// This row's concentration first, then its siblings (dimmed): "EDP · edt · parfum".
+function concTags(it) {
+  const sibs = (groups.get(it.groupKey) || [it]).filter((x) => x.conc && x !== it);
+  const main = it.conc ? `<span class="tag">${it.conc}</span>` : '';
+  return main || sibs.length ? ` ${main}${sibs.map((x) => ` <span class="tag sib">${x.conc}</span>`).join('')}` : '';
+}
+
 function resultRow(it, rank) {
   return `
     <li><a href="#/p/${it.id}">${rank ? `<span class="rank">${rank}</span>` : ''}
-      <span class="nm"><b>${esc(it.name)}</b> <span class="br">${esc(it.brand)}</span>${it.conc ? ` <span class="tag">${it.conc}</span>` : ''}</span>
+      <span class="nm"><b>${esc(it.name)}</b> <span class="br">${esc(it.brand)}</span>${concTags(it)}</span>
       <span class="px">${decantLine(it)}${it.minBottle ? `<span class="dc">bottles from ${money(it.minBottle)} · ${Math.round(it.minBottleMl)} ml</span>` : ''}</span>
     </a></li>`;
 }
@@ -138,7 +172,8 @@ function showPopular() {
   $('#empty').hidden = true;
   $('#results').innerHTML = '';
   document.title = 'Top 1000 fragrances · Scent Prices';
-  const top = items.slice(0, 1000);
+  const seen = new Set();
+  const top = items.filter((it) => !seen.has(it.groupKey) && seen.add(it.groupKey)).slice(0, 1000);
   const withDecants = top.filter((it) => decantHeadline(it)).length;
   const label = SIZES[sizeIdx(sizePref)]?.label;
   $('#detail').innerHTML = `
@@ -246,13 +281,20 @@ async function showPerfume(id) {
   det.innerHTML = `
     <a href="#" class="back">← Back to search</a>
     <h1>${esc(it.name)} <span class="br">${esc(it.brand)}</span></h1>
-    <p class="dim">${CONC[it.conc] || 'Concentration not specified'}</p>
+    ${concTabs(it)}
     ${best ? `<a href="#decants" class="decant-summary" data-jump>
       <span>Cheapest ${label ? `${label} ` : ''}decant ${label ? `<b>${money(best.price)}</b>` : `<b>${money(best.price / best.ml)}/ml</b>`} at ${esc(index.sources[best.src]?.name || best.src)} (${best.ml} ml for ${money(best.price)})</span>
       <span class="dim">${new Set(shown.map((o) => o.src)).size} decant shops ↓</span></a>` : ''}
     <h2 class="sec">Full bottles</h2>
     ${bottleHtml || '<p class="dim">No full bottles in stock at tracked shops right now.</p>'}
     ${decantHtml}`;
+}
+
+function concTabs(it) {
+  const g = groups.get(it.groupKey) || [it];
+  if (g.length < 2) return `<p class="dim">${CONC[it.conc] || 'Concentration not specified'}</p>`;
+  return `<div class="conc-tabs">${g.map((x) => `<a href="#/p/${x.id}" class="chip${x === it ? ' on' : ''}">${CONC[x.conc] || 'Not specified'} <small>${x.nShops} shop${x.nShops === 1 ? '' : 's'}</small></a>`).join('')}</div>
+    ${it.conc ? '' : '<p class="dim small">These shops don\'t say which concentration they sell.</p>'}`;
 }
 
 function openRedditDialog() {

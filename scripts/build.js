@@ -5,7 +5,7 @@
 
 import { readFile, writeFile, mkdir, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { canonicalBrand, concentration, fragranceName, perfumeId, sizeBucket } from './lib/normalize.js';
+import { canonicalBrand, concentration, fragranceName, perfumeId, sizeBucket, brandKey, isNotPerfume, brandFromTitle, words } from './lib/normalize.js';
 
 const root = new URL('../', import.meta.url);
 const readJson = async (p, fallback) => (existsSync(new URL(p, root)) ? JSON.parse(await readFile(new URL(p, root))) : fallback);
@@ -19,6 +19,19 @@ const { sources } = await readJson('config/sources.json');
 const scraped = await readJson('build/offers.json', { offers: [] });
 const reddit = await readJson('data/reddit.json', { posts: [] });
 const history = await readJson('data/history.json', {});
+// Migrate history keys from before ids ignored spacing in names ("dior--sauvage-elixir--edp|60"
+// -> "dior--sauvageelixir--edp|60"); series that now collide merge, keeping each day's lowest.
+for (const key of Object.keys(history)) {
+  const [id, size] = [key.slice(0, key.lastIndexOf('|')), key.slice(key.lastIndexOf('|') + 1)];
+  const parts = id.split('--');
+  if (parts.length < 2 || !parts[1].includes('-')) continue;
+  parts[1] = parts[1].replace(/-/g, '');
+  const next = `${parts.join('--')}|${size}`;
+  const merged = new Map([...(history[next] || []), ...history[key]].map(([d, p]) => [d, p]));
+  for (const [d, p] of [...(history[next] || []), ...history[key]]) merged.set(d, Math.min(merged.get(d), p));
+  history[next] = [...merged].sort((a, b) => a[0] - b[0]);
+  delete history[key];
+}
 
 // --- Reddit posts become offers like any other source -------------------------------------
 const redditOffers = [];
@@ -40,9 +53,37 @@ for (const post of reddit.posts) {
   }
 }
 
-const all = [...scraped.offers, ...redditOffers];
-// Re-run name cleanup so normalizer tweaks apply without re-scraping.
+// Re-apply the "not a perfume" filter so filter tweaks apply without re-scraping (sets, lotions).
+const all = [...scraped.offers, ...redditOffers].filter((o) => !isNotPerfume(o.name));
+
+// MaxAroma offers stored before its brand fix all say "27 87" (the first entry of the site's brand
+// menu). Its product URLs start with the house ("/christian-dior-sauvage-for-men/"), so recover the
+// brand from the URL against every brand seen elsewhere; drop what can't be recovered.
+const known = new Map();
+for (const o of all) if (o.src !== 'maxaroma') known.set(words(o.brand), o.brand);
+for (let i = all.length - 1; i >= 0; i--) {
+  const o = all[i];
+  if (o.src !== 'maxaroma' || brandKey(o.url.split('/')[5] || '').includes(brandKey(o.brand).slice(0, 5))) continue;
+  const slugWords = (o.url.split('/')[5] || '').replace(/-/g, ' ');
+  const brand = brandFromTitle(slugWords, known);
+  if (!brand) { all.splice(i, 1); continue; }
+  o.brand = brand;
+  o.name = fragranceName(slugWords, canonicalBrand(brand), brand);
+}
+// Re-run brand + name cleanup so normalizer tweaks apply without re-scraping.
+for (const o of all) o.brand = canonicalBrand(o.brand) || o.brand;
+// Safety net: spellings of one house that still differ ("Roja Parfums" / "Roja London") merge
+// under the most common spelling.
+const spellings = new Map();
 for (const o of all) {
+  const k = brandKey(o.brand);
+  if (!spellings.has(k)) spellings.set(k, new Map());
+  const m = spellings.get(k);
+  m.set(o.brand, (m.get(o.brand) || 0) + 1);
+}
+const bestSpelling = new Map([...spellings].map(([k, m]) => [k, [...m].sort((a, b) => b[1] - a[1])[0][0]]));
+for (const o of all) {
+  o.brand = bestSpelling.get(brandKey(o.brand));
   o.name = fragranceName(o.name, o.brand, o.brand);
   o.id = perfumeId(o.brand, o.name, o.conc);
 }
