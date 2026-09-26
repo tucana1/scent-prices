@@ -1,5 +1,5 @@
 {
-  "_comment": "Only stores with a public, structured product feed. kind: 'discount' = full-bottle discounter, 'decant' = decant/sample shop, 'mixed' = sells both (small sizes count as decants only when labelled as samples). Shopify stores expose /products.json. brandFrom 'title' = the shop's vendor field is the shop itself, so the house is read from the product title. adapter 'sitemap' = product URLs from the sitemap, a rotating slice checked each day (pageFormat 'jsonld' reads schema.org data from the page; 'shopify-js' reads Shopify's per-product .js for shops that block the bulk feed). Decant/mixed shops need `vouch` (independent evidence: review profiles, community threads) to be scraped; `vetting` records why a shop is on hold.",
+  "_comment": "Only stores with a public, structured product feed. kind: 'discount' = full-bottle discounter, 'decant' = decant/sample shop, 'mixed' = sells both (small sizes count as decants only when labelled as samples). Shopify stores expose /products.json. brandFrom 'title' = the shop's vendor field is the shop itself, so the house is read from the product title. adapter 'sitemap' = product URLs from the sitemap, a rotating slice checked each day (pageFormat 'jsonld' reads schema.org data from the page; 'shopify-js' reads Shopify's per-product .js for shops that block the bulk feed). Decant/mixed shops need `vouch` (independent evidence: at least one real buyer's Reddit post, a review profile, or the site owner's own vouch) to be scraped; `vetting` records why a shop is on hold.",
   "sources": [
     {
       "id": "maxaroma",
@@ -150,7 +150,12 @@
       "kind": "mixed",
       "adapter": "shopify",
       "base": "https://www.scentrique.us",
-      "vetting": "weak: one Fragrantica mention, no review profile"
+      "vouch": [
+        {
+          "label": "Reddit: buyer comparison",
+          "url": "https://www.reddit.com/r/fragranceclones/comments/1s1sjxa/reel_vs_deal_xerjoff_naxos_vs_rayhaan_italia/"
+        }
+      ]
     },
     {
       "id": "scentsangel",
@@ -194,7 +199,12 @@
       "kind": "mixed",
       "adapter": "shopify",
       "base": "https://aromatick.com",
-      "vetting": "none: advertises 11,000+ Trustpilot reviews but no such profile exists"
+      "vouch": [
+        {
+          "label": "vouched by site owner",
+          "url": "https://aromatick.com"
+        }
+      ]
     },
     {
       "id": "richandluxe",
@@ -202,7 +212,7 @@
       "kind": "mixed",
       "adapter": "shopify",
       "base": "https://www.richandluxe.com",
-      "vetting": "weak: one Fragrantica thread, no review profile"
+      "vetting": "only a Reddit question with no visible answer; one Fragrantica thread"
     },
     {
       "id": "decantx",
@@ -253,7 +263,12 @@
       "kind": "decant",
       "adapter": "shopify",
       "base": "https://fragrancesline.com",
-      "vetting": "weak: Trustpilot 3.0 from 4 reviews; BBB 4 reviews"
+      "vouch": [
+        {
+          "label": "Reddit: buyer haul",
+          "url": "https://www.reddit.com/r/FemFragLab/comments/1t4q9ks/scentsplit_and_fragrancesline_grabs/"
+        }
+      ]
     },
     {
       "id": "microperfumes",
@@ -304,7 +319,7 @@
       "kind": "decant",
       "adapter": "shopify",
       "base": "https://olenasaromashop.com",
-      "vetting": "weak: only the shop's own review app and 6 Facebook reviews"
+      "vetting": "no Reddit posts found; reviews only in the shop's own review app"
     },
     {
       "id": "mystic",
@@ -325,7 +340,7 @@
       "kind": "decant",
       "adapter": "shopify",
       "base": "https://discoverydecants.com",
-      "vetting": "none: no independent reviews or mentions"
+      "vetting": "no Reddit posts found beyond the shop's own subreddit"
     },
     {
       "id": "tryscents",
@@ -333,7 +348,12 @@
       "kind": "decant",
       "adapter": "shopify",
       "base": "https://tryscentsdecants.com",
-      "vetting": "none: one 1-star Trustpilot review; implausible on-site review count for its age"
+      "vouch": [
+        {
+          "label": "Reddit: buyer review",
+          "url": "https://www.reddit.com/r/fragranceclones/comments/1wdk6h4/freeze_in_flames_review/"
+        }
+      ]
     },
     {
       "id": "dynasty",
@@ -341,7 +361,12 @@
       "kind": "decant",
       "adapter": "shopify",
       "base": "https://www.dynastydecants.com",
-      "vetting": "none: pays $10 for Reddit reviews; no independent reviews"
+      "vouch": [
+        {
+          "label": "Reddit: buyer recommends",
+          "url": "https://www.reddit.com/r/fragranceclones/comments/1pyoytk/decant_drop_ranking_fierte_luna_liam_grey_aether/"
+        }
+      ]
     },
     {
       "id": "decantedclone",
@@ -349,7 +374,7 @@
       "kind": "decant",
       "adapter": "shopify",
       "base": "https://decantedclone.com",
-      "vetting": "none: no independent reviews"
+      "vetting": "no Reddit posts found"
     },
     {
       "id": "parfumexquis",
@@ -375,7 +400,7 @@
       "adapter": "shopify",
       "base": "https://samplescents.com",
       "brandFrom": "title",
-      "vetting": "none: no independent reviews (not the UK samplescents.co.uk)"
+      "vetting": "no Reddit posts or reviews found (not the UK samplescents.co.uk)"
     },
     {
       "id": "decantalize",
@@ -384,7 +409,12 @@
       "adapter": "shopify",
       "base": "https://decantalize.com",
       "brandFrom": "title",
-      "vetting": "weak: 2 Trustpilot reviews"
+      "vouch": [
+        {
+          "label": "Reddit: buyer kudos",
+          "url": "https://www.reddit.com/r/fragrance/comments/1ih2neh/decantalize_kudos/"
+        }
+      ]
     },
     {
       "id": "scentdecant",
@@ -420,7 +450,12 @@
       "adapter": "shopify",
       "base": "https://decantified.com",
       "brandFrom": "title",
-      "vetting": "weak: 11-month-old domain, reviews only on its own site, flagged by a malware scanner"
+      "vouch": [
+        {
+          "label": "Reddit: order review",
+          "url": "https://www.reddit.com/r/fragranceclones/comments/1qm7cv2/decantified_order_review_very_happy/"
+        }
+      ]
     },
     {
       "id": "scentsuave",
@@ -429,7 +464,12 @@
       "adapter": "shopify",
       "base": "https://www.scentsuave.com",
       "brandFrom": "title",
-      "vetting": "none: 1-year-old domain, no reviews anywhere"
+      "vouch": [
+        {
+          "label": "Reddit: buyer review",
+          "url": "https://www.reddit.com/r/Colognes/comments/1nvaty2/tested_10_samples_of_very_popularhyped_fragrances/"
+        }
+      ]
     },
     {
       "id": "decanthouse",
@@ -485,7 +525,7 @@
       "adapter": "shopify",
       "base": "https://projectfrags.com",
       "brandFrom": "title",
-      "vetting": "weak: TikTok mentions only, no review profile"
+      "vetting": "no Reddit posts found; TikTok mentions only"
     },
     {
       "id": "decantary",
@@ -493,7 +533,23 @@
       "kind": "decant",
       "adapter": "shopify",
       "base": "https://thedecantary.net",
-      "vetting": "none: only paid press releases"
+      "vetting": "no Reddit posts found; only paid press releases"
+    },
+    {
+      "id": "decantanddiscover",
+      "name": "Decant & Discover",
+      "kind": "decant",
+      "adapter": "shopify",
+      "base": "https://www.decantanddiscover.com",
+      "brandFromPageTitle": true,
+      "pageBase": "https://decantanddiscover.com",
+      "brandPagesPerRun": 300,
+      "vouch": [
+        {
+          "label": "vouched by site owner",
+          "url": "https://decantanddiscover.com"
+        }
+      ]
     }
   ]
 }

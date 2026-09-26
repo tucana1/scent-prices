@@ -328,8 +328,24 @@ const ADAPTERS = {
     const offers = [];
     const products = [];
     let n = 0;
+    // Some shops (Decant & Discover) leave the house out of their product data entirely; each
+    // product page's title says it ("Bodacious Decant by Boadicea the Victorious | ..."). Brands
+    // don't change, so each page is fetched once and cached (up to brandPagesPerRun per run).
+    const brandCache = src.brandFromPageTitle ? (jsonldState[`${src.id}:brands`] ||= {}) : null;
+    let brandFetches = 0;
     for await (const p of shopifyProducts(src.base)) {
       n++;
+      if (brandCache) {
+        if (!(p.handle in brandCache) && brandFetches < (src.brandPagesPerRun || 300)) {
+          brandFetches++;
+          const html = await fetchWithRetry(`${src.pageBase}/products/${p.handle}`, src.throttle, 'text/html').catch(() => null);
+          const brand = html?.match(/<title>[^<|]*?\sby\s+([^|<]+?)\s*(?:\||<)/i)?.[1];
+          brandCache[p.handle] = brand ? decodeHtml(brand) : null;
+        }
+        if (!brandCache[p.handle]) continue;
+        offers.push(...offersFromShopify(src, { ...p, vendor: brandCache[p.handle] }));
+        continue;
+      }
       // Title-branded shops are resolved after the others finish, against every brand seen.
       if (src.brandFrom === 'title') products.push({ title: p.title, product_type: p.product_type, handle: p.handle, variants: p.variants });
       else offers.push(...offersFromShopify(src, p));
@@ -362,7 +378,7 @@ try {
 const stateFile = new URL('../build/jsonld-state.json', import.meta.url);
 let jsonldState = {};
 try { jsonldState = JSON.parse(await readFile(stateFile)); } catch {}
-for (const src of sources) if (src.adapter === 'sitemap') src.throttle = makeThrottle(src.rps || 1);
+for (const src of sources) if (src.adapter === 'sitemap' || src.brandFromPageTitle) src.throttle = makeThrottle(src.rps || 1);
 
 // Crawl all sources concurrently; the shared throttle above keeps the total request rate polite.
 const results = await Promise.all(picked.map(async (src) => {
