@@ -111,7 +111,7 @@ const shardOf = (id) => {
 };
 
 for (const [id, p] of perfumes) {
-  const offers = [...p.offers.values()].map(({ id: _i, brand: _b, name: _n, conc: _c, ...rest }) => rest);
+  const offers = [...p.offers.values()].map(({ id: _i, brand: _b, name: _n, conc: _c, perSize: _p, ...rest }) => rest);
   const bottles = offers.filter((o) => o.kind === 'bottle').sort((a, b) => a.price - b.price);
   const decants = offers.filter((o) => o.kind === 'decant').sort((a, b) => a.price / a.ml - b.price / b.ml);
 

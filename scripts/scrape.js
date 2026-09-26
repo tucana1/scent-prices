@@ -246,7 +246,7 @@ function offersFromItems(src, page, knownBrands, skipped) {
       id: perfumeId(brand, name, conc), brand, name, conc,
       src: src.id, kind: byCategory || kindOf(src, ml, `${it.title} ${it.text}`), ml, price: it.price,
       tester: /tester/i.test(page.category || '') || isTester(`${it.title} ${it.text}`) || undefined,
-      url: it.url, seen: today,
+      url: it.url, seen: today, perSize: it.perSize,
     });
   }
   return out;
@@ -291,7 +291,8 @@ const ADAPTERS = {
       if (!body) continue;
       if (expand) {
         const { url, category } = byKey.get(key);
-        pages.push({ key, category, items: await expand(src, { html: body, cookie: got.cookie, url }, throttle) });
+        const items = (await expand(src, { html: body, cookie: got.cookie, url }, throttle)).map((it) => ({ ...it, perSize: true }));
+        pages.push({ key, category, items });
         continue;
       }
       if (shopifyJs) {
@@ -309,7 +310,8 @@ const ADAPTERS = {
     const keyOf = (url) => url.match(new RegExp(src.idPattern))?.[1];
     // `minSeen` retires offers recorded before a parser fix (they'd otherwise linger up to maxAgeDays).
     const carried = previousAll.filter((o) => o.src === src.id && !fresh.has(keyOf(o.url)) && byKey.has(keyOf(o.url)) &&
-      dayNum(today) - dayNum(o.seen) <= src.maxAgeDays && (!src.minSeen || o.seen >= src.minSeen));
+      dayNum(today) - dayNum(o.seen) <= src.maxAgeDays && (!src.minSeen || o.seen >= src.minSeen) &&
+      (!expand || o.perSize)); // per-size shops: drop offers recorded before every size was fetched
     const coverage = Object.keys(checked).filter((k) => byKey.has(k)).length;
     const skipped = {};
     const fromPage = (p, knownBrands) => (shopifyJs
