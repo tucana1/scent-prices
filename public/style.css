@@ -132,3 +132,11 @@ dialog button.primary { background: var(--accent); border-color: var(--accent); 
 .popular-head a { color: var(--accent); font-weight: 600; font-size: 14px; text-decoration: none; }
 .rank { width: 2.4em; flex: none; color: var(--dim); font-variant-numeric: tabular-nums; }
 .results li a .nm { flex: 1; }
+
+.sizes { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; font-size: 13px; }
+.sizes .dim { margin-right: 2px; }
+.sizes.inline { margin: 0 0 10px; }
+.chip { font: inherit; font-size: 13px; padding: 4px 10px; border-radius: 99px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+.chip:hover:not(:disabled) { border-color: var(--accent); }
+.chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.chip:disabled { opacity: .4; cursor: default; }

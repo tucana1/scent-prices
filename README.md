@@ -2,6 +2,8 @@
 
 Search any fragrance and compare decant prices across every tracked decant shop, sorted by price per ml, plus Reddit splits people submit. Full-bottle prices from discounters are included too. There are no affiliate links.
 
+**Decant size selector:** chips under the search box (Any, 1, 2, 3, 5, 10, 15–30 ml) switch every price on the site to that size: search results, the popular list, the Top 1,000 page, and each fragrance's decant table and "cheapest decant" summary. The choice is remembered in the browser. The index stores the cheapest price per size bucket for each fragrance.
+
 **Top 1,000:** `#/popular` ranks fragrances by how many tracked shops stock them, a stand-in for popularity since there's no open popularity dataset. The build log reports coverage, for example "top 1000: 993 have decants, 876 have 3+ decant shops".
 
 ## How it works
@@ -49,14 +51,17 @@ Most shops are read from Shopify's public `/products.json` feed. Shops that aren
 | [The Fragrance Sample Shop](https://thefragrancesampleshop.com) | decants |
 | [Decantified](https://decantified.com) | decants |
 | [Scent Suave](https://www.scentsuave.com) | decants |
-| [Decant House](https://www.decanthouse.com) | decants (rotating crawl, default size only) |
-| [Surrender to Chance](https://surrendertochance.com) | decants (rotating crawl, default size only) |
+| [Decant House](https://www.decanthouse.com) | decants (rotating crawl, every size) |
+| [Surrender to Chance](https://surrendertochance.com) | decants (rotating crawl, every size) |
 | [Project Frags](https://projectfrags.com) | decants |
+| [The Decantary](https://thedecantary.net) | decants |
 | [Venba Fragrance](https://www.venbafragrance.com) | bottles + samples (rotating crawl, per-product Shopify data) |
 | [Fragrancelord](https://fragrancelord.com) | bottles + samples |
 | [Scentrique](https://www.scentrique.us) | bottles + samples |
 | [Scents Angel](https://www.scentsangel.com) | bottles + samples |
 | [Luckyscent](https://www.luckyscent.com) | bottles + samples (rotating crawl, schema.org page data) |
+| [Aromatick](https://aromatick.com) | bottles + samples |
+| [Rich and Luxe](https://www.richandluxe.com) | bottles + samples |
 | [MaxAroma](https://www.maxaroma.com) | discounter (rotating crawl, schema.org page data) |
 | [Perfumania](https://perfumania.com) | discounter |
 | [Beauty Encounter](https://www.beautyencounter.com) | discounter |
@@ -73,10 +78,10 @@ Most shops are read from Shopify's public `/products.json` feed. Shops that aren
 | Reddit posts (submitted) | decants + bottles, expire after 60 days |
 
 **Left out on purpose:**
-- **FragranceNet, FragranceX, Perfume.com, FragranceBuy, FragranceShop.com and The Fragrance Decant Boutique** block automated requests (403 or Cloudflare challenges). The legitimate route to the big discounters is their affiliate data feeds (CJ, Rakuten, Impact); you don't have to use the referral links.
+- **FragranceNet, FragranceX, Perfume.com, FragranceBuy, FragranceShop.com, The Fragrance Decant Boutique and Decant Store** block automated requests (403 or Cloudflare challenges). The legitimate route to the big discounters is their affiliate data feeds (CJ, Rakuten, Impact); you don't have to use the referral links.
 - **Jomashop** loads prices from an API that answers "Bot Protection Triggered".
 
-**Rotating crawls.** Some sources have one page per product: **MaxAroma** (schema.org data), **Venba** (Shopify's per-product `.js` data; its bulk feed is blocked), **Luckyscent** (schema.org variants), **Surrender to Chance** (BigCommerce) and **Decant House** (nopCommerce). For the last two, only the default size's price is in the page. Their other sizes come from a cart endpoint that robots.txt disallows, so the site doesn't read them.
+**Rotating crawls.** Some sources have one page per product: **MaxAroma** (schema.org data), **Venba** (Shopify's per-product `.js` data; its bulk feed is blocked), **Luckyscent** (schema.org variants), **Surrender to Chance** (BigCommerce) and **Decant House** (nopCommerce). For the last two, the page only carries the base price, so each size's price and stock come from the same request the product page makes when you pick a size (`allSizes` in the config). Decant House's robots.txt disallows that endpoint; the owner of this site confirmed permission to read it. It runs at a gentle rate (about 1.5 requests/sec, 250 products/day).
 
 **MaxAroma** isn't on Shopify. Its product pages carry schema.org price data, one size per page, across about 18k fragrance pages. The `jsonld` adapter checks 1,200 of those pages a day, oldest first, so the whole catalog refreshes about every 15 days. Offers are carried forward for up to 21 days, and the site shows "price as of <date>" on anything older than 2 days. A product is skipped if its brand doesn't appear at any other shop, which is safer than guessing.
 - **Fragrance Outlet** has the same catalog as Perfumania. **FragranceUSA** lists almost everything as out of stock. **Decant & Discover** doesn't name the original brand.

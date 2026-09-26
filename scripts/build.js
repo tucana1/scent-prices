@@ -11,6 +11,8 @@ const root = new URL('../', import.meta.url);
 const readJson = async (p, fallback) => (existsSync(new URL(p, root)) ? JSON.parse(await readFile(new URL(p, root))) : fallback);
 
 const REDDIT_MAX_AGE_DAYS = 60;
+// Decant size buckets (ml, exclusive lower / inclusive upper): 1, 2, 3, 5, 10, 15-35 ml.
+const SIZE_BUCKETS = [[0, 1.5], [1.5, 2.5], [2.5, 4], [4, 7], [7, 12.5], [12.5, 36]];
 const today = Math.floor(Date.now() / 86400000); // days since epoch
 
 const { sources } = await readJson('config/sources.json');
@@ -140,7 +142,13 @@ for (const [id, p] of perfumes) {
   // Popularity proxy: how many different shops stock it (no public "most popular" dataset exists).
   const nShops = new Set(offers.map((o) => o.src)).size;
   const nDecantShops = new Set(decants.map((o) => o.src)).size;
-  rows.push([brandIdx.get(p.brand), name, p.conc, minBottle, minBottleMl, minDecantPerMl, offers.length, nShops, nDecantShops]);
+  // Cheapest decant price per size bucket, for the site's decant-size selector (0 = none).
+  // Buckets must match SIZE_BUCKETS in public/app.js.
+  const sizeMins = SIZE_BUCKETS.map(([lo, hi]) => {
+    const inBucket = decants.filter((o) => o.ml > lo && o.ml <= hi).map((o) => o.price);
+    return inBucket.length ? Math.min(...inBucket) : 0;
+  });
+  rows.push([brandIdx.get(p.brand), name, p.conc, minBottle, minBottleMl, minDecantPerMl, offers.length, nShops, nDecantShops, sizeMins]);
   shards[shardOf(id)][id] = { bottles, decants, hist };
 }
 

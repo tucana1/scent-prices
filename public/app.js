@@ -9,6 +9,39 @@ const dayToDate = (d) => new Date(d * 86400000).toISOString().slice(0, 10);
 const CONC = { EDP: 'Eau de Parfum', EDT: 'Eau de Toilette', EDC: 'Eau de Cologne', Parfum: 'Parfum', Extrait: 'Extrait de Parfum' };
 const ALIASES = { ysl: 'yves saint laurent', mfk: 'maison francis kurkdjian', pdm: 'parfums de marly', jpg: 'jean paul gaultier', 'd g': 'dolce gabbana', ck: 'calvin klein' };
 
+// Decant size selector. Buckets must match SIZE_BUCKETS in scripts/build.js (same order).
+const SIZES = [
+  { k: '1', label: '1 ml', lo: 0, hi: 1.5 },
+  { k: '2', label: '2 ml', lo: 1.5, hi: 2.5 },
+  { k: '3', label: '3 ml', lo: 2.5, hi: 4 },
+  { k: '5', label: '5 ml', lo: 4, hi: 7 },
+  { k: '10', label: '10 ml', lo: 7, hi: 12.5 },
+  { k: '15', label: '15–30 ml', lo: 12.5, hi: 36 },
+];
+const sizeIdx = (k) => SIZES.findIndex((z) => z.k === k);
+const inSize = (o, k) => { const z = SIZES[sizeIdx(k)]; return !z || (o.ml > z.lo && o.ml <= z.hi); };
+let sizePref = 'any';
+try { sizePref = localStorage.getItem('decantSize') || 'any'; } catch {}
+if (sizePref !== 'any' && sizeIdx(sizePref) < 0) sizePref = 'any';
+
+function renderSizeChips() {
+  $('#sizes').innerHTML = `<span class="dim">Decant size</span>` +
+    [{ k: 'any', label: 'Any' }, ...SIZES].map((z) => `<button class="chip${z.k === sizePref ? ' on' : ''}" data-size="${z.k}">${z.label}</button>`).join('');
+}
+function setSize(k) {
+  sizePref = k;
+  try { localStorage.setItem('decantSize', k); } catch {}
+  renderSizeChips();
+  renderPopularPreview();
+  route();
+}
+// Price to show for an index row under the current size choice: [price, isPerMl] or null.
+function decantHeadline(it) {
+  if (sizePref === 'any') return it.minDecant ? [it.minDecant, true] : null;
+  const v = it.sizeMins[sizeIdx(sizePref)];
+  return v ? [v, false] : null;
+}
+
 let index, items = [];
 const shardCache = new Map();
 
@@ -20,18 +53,22 @@ function shardOf(id) {
 
 async function loadIndex() {
   index = await fetch('data/index.json').then((r) => r.json());
-  items = index.rows.map(([b, name, conc, minBottle, minBottleMl, minDecant, n, nShops = 0, nDecantShops = 0]) => {
+  items = index.rows.map(([b, name, conc, minBottle, minBottleMl, minDecant, n, nShops = 0, nDecantShops = 0, sizeMins = []]) => {
     const brand = index.brands[b];
     const id = [slug(brand), slug(name), conc ? conc.toLowerCase() : ''].filter(Boolean).join('--');
-    return { id, brand, name, conc, minBottle, minBottleMl, minDecant, n, nShops, nDecantShops, hay: ` ${words(`${brand} ${name} ${conc} ${CONC[conc] || ''}`)} `, brandW: words(brand) };
+    return { id, brand, name, conc, minBottle, minBottleMl, minDecant, n, nShops, nDecantShops, sizeMins, hay: ` ${words(`${brand} ${name} ${conc} ${CONC[conc] || ''}`)} `, brandW: words(brand) };
   });
   const age = Math.round((Date.now() - Date.parse(index.updated)) / 3600000);
   const shops = Object.values(index.sources);
   const nDisc = shops.filter((s) => s.kind === 'discount').length;
   const nDecant = shops.filter((s) => s.kind === 'decant' || s.kind === 'mixed').length;
-  const pop = items.filter((it) => it.minDecant).slice(0, 12);
-  $('#popular').innerHTML = pop.map((it) => resultRow(it)).join('');
+  renderSizeChips();
+  renderPopularPreview();
   $('#meta').innerHTML = `${items.length.toLocaleString()} fragrances · <button class="linkish" data-shops="decant">${nDecant} decant shops</button> · <button class="linkish" data-shops="discount">${nDisc} discounters</button> + Reddit · updated ${age < 1 ? 'just now' : `${age}h ago`}`;
+}
+
+function renderPopularPreview() {
+  $('#popular').innerHTML = items.filter((it) => decantHeadline(it)).slice(0, 12).map((it) => resultRow(it)).join('');
 }
 
 function search(q) {
@@ -51,7 +88,7 @@ function search(q) {
     if (!ok) continue;
     if (toks.join(' ') === it.brandW) score -= 1; // pure brand query: keep popularity order
     // Decant comparison first: among equally good matches, ones with decants rank higher.
-    out.push([score * 1000 + (it.minDecant ? 500 : 0) + Math.min(it.n, 499), it]);
+    out.push([score * 1000 + (decantHeadline(it) ? 500 : 0) + Math.min(it.n, 499), it]);
     if (out.length > 3000) break;
   }
   return out.sort((a, b) => b[0] - a[0]).slice(0, 40).map((x) => x[1]);
@@ -72,11 +109,19 @@ function openShops(first) {
   $('#shopsDlg').showModal();
 }
 
+function decantLine(it) {
+  const h = decantHeadline(it);
+  const label = SIZES[sizeIdx(sizePref)]?.label;
+  if (!h) return `<span class="dim">${label ? `no ${label} decants` : 'no decants yet'}</span>`;
+  const shops = it.nDecantShops > 1 && sizePref === 'any' ? ` <small>· ${it.nDecantShops} shops</small>` : '';
+  return h[1] ? `decants from <b>${money(h[0])}/ml</b>${shops}` : `${label} from <b>${money(h[0])}</b>`;
+}
+
 function resultRow(it, rank) {
   return `
     <li><a href="#/p/${it.id}">${rank ? `<span class="rank">${rank}</span>` : ''}
       <span class="nm"><b>${esc(it.name)}</b> <span class="br">${esc(it.brand)}</span>${it.conc ? ` <span class="tag">${it.conc}</span>` : ''}</span>
-      <span class="px">${it.minDecant ? `decants from <b>${money(it.minDecant)}/ml</b>${it.nDecantShops > 1 ? ` <small>· ${it.nDecantShops} shops</small>` : ''}` : '<span class="dim">no decants yet</span>'}${it.minBottle ? `<span class="dc">bottles from ${money(it.minBottle)} · ${Math.round(it.minBottleMl)} ml</span>` : ''}</span>
+      <span class="px">${decantLine(it)}${it.minBottle ? `<span class="dc">bottles from ${money(it.minBottle)} · ${Math.round(it.minBottleMl)} ml</span>` : ''}</span>
     </a></li>`;
 }
 
@@ -94,11 +139,12 @@ function showPopular() {
   $('#results').innerHTML = '';
   document.title = 'Top 1000 fragrances · Scent Prices';
   const top = items.slice(0, 1000);
-  const withDecants = top.filter((it) => it.minDecant).length;
+  const withDecants = top.filter((it) => decantHeadline(it)).length;
+  const label = SIZES[sizeIdx(sizePref)]?.label;
   $('#detail').innerHTML = `
     <a href="#" class="back">← Back to search</a>
     <h1>Top 1,000 fragrances</h1>
-    <p class="dim">Ranked by how many of the tracked shops stock each one, a stand-in for popularity. ${withDecants.toLocaleString()} of them have decants listed right now.</p>
+    <p class="dim">Ranked by how many of the tracked shops stock each one, a stand-in for popularity. ${withDecants.toLocaleString()} of them have ${label ? `${label} ` : ''}decants listed right now.</p>
     <ol class="results">${top.map((it, i) => resultRow(it, i + 1)).join('')}</ol>`;
   window.scrollTo(0, 0);
 }
@@ -174,26 +220,36 @@ async function showPerfume(id) {
   }).join('');
 
   const dLo = lowest(p.hist.d);
-  const decantHtml = p.decants.length ? `
-    <h2 class="sec" id="decants">Decants <span class="dim">sorted by price per ml</span></h2>
-    ${dLo ? `<p class="hist">${sparkline(p.hist.d)}<span>lowest tracked shop decant <b>${money(dLo[1])}/ml</b> <small>${dayToDate(dLo[0])}</small></span></p>` : ''}
-    <table><tbody>${p.decants.map((o, i) => `
+  // Decants for the chosen size, cheapest first; "Any" ranks by price per ml.
+  const label = SIZES[sizeIdx(sizePref)]?.label;
+  const shown = sizePref === 'any' ? p.decants : p.decants.filter((o) => inSize(o, sizePref)).sort((a, b) => a.price - b.price);
+  const counts = SIZES.map((z) => p.decants.filter((o) => inSize(o, z.k)).length);
+  const chips = `<div class="sizes inline">${[{ k: 'any', label: `Any (${p.decants.length})`, n: p.decants.length },
+    ...SIZES.map((z, i) => ({ k: z.k, label: `${z.label} (${counts[i]})`, n: counts[i] }))]
+    .map((z) => `<button class="chip${z.k === sizePref ? ' on' : ''}" data-size="${z.k}"${z.n ? '' : ' disabled'}>${z.label}</button>`).join('')}</div>`;
+  const rows = shown.map((o, i) => `
       <tr class="${i === 0 ? 'best' : ''}">
         <td>${sourceCell(o)}</td>
         <td class="num">${o.ml} ml</td>
         <td class="num">${money(o.price)}</td>
         <td class="num dim">${money(o.price / o.ml)}/ml</td>
         <td class="go"><a href="${esc(o.url)}" target="_blank" rel="noopener nofollow">View →</a></td>
-      </tr>`).join('')}</tbody></table>
+      </tr>`).join('');
+  const decantHtml = p.decants.length ? `
+    <h2 class="sec" id="decants">Decants <span class="dim">${sizePref === 'any' ? 'all sizes, sorted by price per ml' : `${label}, sorted by price`}</span></h2>
+    ${chips}
+    ${dLo && sizePref === 'any' ? `<p class="hist">${sparkline(p.hist.d)}<span>lowest tracked shop decant <b>${money(dLo[1])}/ml</b> <small>${dayToDate(dLo[0])}</small></span></p>` : ''}
+    ${shown.length ? `<table><tbody>${rows}</tbody></table>` : `<p class="dim">No ${label} decants for this one. <button class="linkish" data-size="any">Show all sizes</button></p>`}
     <p class="dim reddit-inline">Seen it cheaper on Reddit? <button class="linkish" data-reddit>Add the post</button></p>` : `<p class="dim sec">No decants found yet. Know a Reddit split? <button class="linkish" data-reddit>Add the post</button></p>`;
+  const best = shown[0];
 
   det.innerHTML = `
     <a href="#" class="back">← Back to search</a>
     <h1>${esc(it.name)} <span class="br">${esc(it.brand)}</span></h1>
     <p class="dim">${CONC[it.conc] || 'Concentration not specified'}</p>
-    ${p.decants.length ? `<a href="#decants" class="decant-summary" data-jump>
-      <span>Cheapest decant <b>${money(p.decants[0].price / p.decants[0].ml)}/ml</b> at ${esc(index.sources[p.decants[0].src]?.name || p.decants[0].src)} (${p.decants[0].ml} ml for ${money(p.decants[0].price)})</span>
-      <span class="dim">${new Set(p.decants.map((o) => o.src)).size} decant shops ↓</span></a>` : ''}
+    ${best ? `<a href="#decants" class="decant-summary" data-jump>
+      <span>Cheapest ${label ? `${label} ` : ''}decant ${label ? `<b>${money(best.price)}</b>` : `<b>${money(best.price / best.ml)}/ml</b>`} at ${esc(index.sources[best.src]?.name || best.src)} (${best.ml} ml for ${money(best.price)})</span>
+      <span class="dim">${new Set(shown.map((o) => o.src)).size} decant shops ↓</span></a>` : ''}
     <h2 class="sec">Full bottles</h2>
     ${bottleHtml || '<p class="dim">No full bottles in stock at tracked shops right now.</p>'}
     ${decantHtml}`;
@@ -213,6 +269,8 @@ $('#redditForm').addEventListener('submit', (e) => {
 });
 document.addEventListener('click', (e) => {
   if (e.target.closest('[data-reddit]')) openRedditDialog();
+  const size = e.target.closest('[data-size]');
+  if (size && !size.disabled) setSize(size.dataset.size);
   const shops = e.target.closest('[data-shops]');
   if (shops) openShops(shops.dataset.shops);
   if (e.target.closest('[data-jump]')) { e.preventDefault(); $('#decants')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }

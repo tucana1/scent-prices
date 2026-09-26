@@ -163,6 +163,13 @@
       "base": "https://aromatick.com"
     },
     {
+      "id": "richandluxe",
+      "name": "Rich and Luxe",
+      "kind": "mixed",
+      "adapter": "shopify",
+      "base": "https://www.richandluxe.com"
+    },
+    {
       "id": "decantx",
       "name": "DecantX",
       "kind": "decant",
@@ -316,8 +323,11 @@
       "base": "https://www.decanthouse.com",
       "sitemap": "https://www.decanthouse.com/sitemap.xml",
       "idPattern": "decanthouse\\.com/([^/?#]+)$",
-      "dailyBudget": 400,
-      "maxAgeDays": 10
+      "dailyBudget": 250,
+      "maxAgeDays": 10,
+      "allSizes": true,
+      "rps": 1.5,
+      "minSeen": "2026-09-26"
     },
     {
       "id": "surrendertochance",
@@ -329,8 +339,11 @@
       "sitemap": "https://surrendertochance.com/xmlsitemap.php",
       "sitemapInclude": "type=products",
       "idPattern": "surrendertochance\\.com/([^/?#]+)/?$",
-      "dailyBudget": 700,
-      "maxAgeDays": 14
+      "dailyBudget": 300,
+      "maxAgeDays": 21,
+      "allSizes": true,
+      "rps": 2,
+      "minSeen": "2026-09-26"
     },
     {
       "id": "projectfrags",
@@ -339,6 +352,13 @@
       "adapter": "shopify",
       "base": "https://projectfrags.com",
       "brandFrom": "title"
+    },
+    {
+      "id": "decantary",
+      "name": "The Decantary",
+      "kind": "decant",
+      "adapter": "shopify",
+      "base": "https://thedecantary.net"
     }
   ]
 }

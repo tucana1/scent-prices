@@ -33,11 +33,17 @@ const shopifyThrottle = makeThrottle(MAX_RPS);
 
 // Returns the response body as text (null for 404s etc.). The body is read inside the retry loop:
 // a big page read slowly under load can time out after the headers have arrived.
-async function fetchWithRetry(url, throttle, accept, tries = 6) {
+// Returns the response body as text (null for 404s etc.). The body is read inside the retry loop:
+// a big page read slowly under load can time out after the headers have arrived.
+// opts: { method, body, headers, full } - `full` returns { text, cookie } (cookie = Set-Cookie pairs).
+async function fetchWithRetry(url, throttle, accept, tries = 6, opts = {}) {
   for (let i = 1; ; i++) {
     await throttle();
     try {
-      const res = await fetch(url, { headers: { 'user-agent': UA, accept }, signal: AbortSignal.timeout(90000) });
+      const res = await fetch(url, {
+        method: opts.method || 'GET', body: opts.body,
+        headers: { 'user-agent': UA, accept, ...opts.headers }, signal: AbortSignal.timeout(90000),
+      });
       if (res.status === 429 || res.status >= 500) {
         if (i >= tries) throw new Error(`HTTP ${res.status}`);
         const wait = (+res.headers.get('retry-after') || 15 * 2 ** (i - 1)) * 1000;
@@ -45,7 +51,10 @@ async function fetchWithRetry(url, throttle, accept, tries = 6) {
         throttle.backOff(wait);
         continue;
       }
-      return res.ok ? await res.text() : null;
+      const text = res.ok ? await res.text() : null;
+      if (!opts.full) return text;
+      const cookie = res.headers.getSetCookie().map((c) => c.split(';')[0]).join('; ');
+      return { text, cookie };
     } catch (e) {
       if (i >= tries || /^HTTP/.test(e.message)) throw e;
       await sleep(5000 * i);
@@ -173,6 +182,51 @@ const PAGE_PARSERS = {
   },
 };
 
+// Shops that price each size through the same request their product page makes when you pick a
+// size. `page` is { html, cookie, url }; returns items like PAGE_PARSERS, one per size.
+const SIZE_EXPANDERS = {
+  async nopcommerce(src, page, throttle) {
+    const [base] = PAGE_PARSERS.nopcommerce(page.html, page.url);
+    const productId = page.html.match(/productdetails_attributechange\/(\d+)\//)?.[1];
+    const select = page.html.match(/<select[^>]*name="(product_attribute_\d+)"[\s\S]*?<\/select>/);
+    const token = page.html.match(/name="__RequestVerificationToken" type="hidden" value="([^"]+)"/)?.[1];
+    if (!base || !productId || !select || !token) return base ? [base] : [];
+    const options = [...select[0].matchAll(/<option data-attr-value="(\d+)"[^>]*>([^<]+)/g)];
+    const items = [];
+    for (const [, value, label] of options) {
+      const body = new URLSearchParams({ [select[1]]: value, __RequestVerificationToken: token });
+      const res = await fetchWithRetry(`${src.base}/shoppingcart/productdetails_attributechange/${productId}/False/True`, throttle,
+        'application/json', 3, { method: 'POST', body, headers: { cookie: page.cookie, 'x-requested-with': 'XMLHttpRequest' } }).catch(() => null);
+      let j;
+      try { j = JSON.parse(res); } catch { continue; }
+      items.push({ ...base, text: `${decodeHtml(label)} ${base.title}`, price: +String(j.price).replace(/[^\d.]/g, ''),
+        inStock: /in stock/i.test(j.stockAvailability || ''), url: page.url });
+    }
+    return items;
+  },
+  async bigcommerce(src, page, throttle) {
+    const [base] = PAGE_PARSERS.bigcommerce(page.html, page.url);
+    const productId = page.html.match(/name="product_id" value="(\d+)"/)?.[1];
+    const attr = page.html.match(/type="radio"[^>]*name="(attribute\[\d+\])"/)?.[1] || page.html.match(/name="(attribute\[\d+\])"[^>]*type="radio"/)?.[1];
+    if (!base || !productId || !attr) return base ? [base] : [];
+    // One request per distinct size: a "1 ml vial" and a "1 ml spray" are the same size to compare.
+    const seenMl = new Set();
+    const options = [...page.html.matchAll(/data-product-attribute-value="(\d+)">\s*<span class="form-option-variant">([^<]+)/g)]
+      .filter(([, , label]) => { const ml = sizeMl(label); if (!ml || seenMl.has(ml)) return false; seenMl.add(ml); return true; });
+    const items = [];
+    for (const [, value, label] of options) {
+      const body = new URLSearchParams({ action: 'add', product_id: productId, [attr]: value, 'qty[]': '1' });
+      const res = await fetchWithRetry(`${src.base}/remote/v1/product-attributes/${productId}`, throttle, 'application/json', 3,
+        { method: 'POST', body, headers: { cookie: page.cookie, 'x-requested-with': 'XMLHttpRequest' } }).catch(() => null);
+      let d;
+      try { d = JSON.parse(res).data; } catch { continue; }
+      items.push({ ...base, text: `${decodeHtml(label)} ${base.title}`, price: +d?.price?.without_tax?.value,
+        inStock: !!(d?.instock && d?.purchasable), url: page.url });
+    }
+    return items;
+  },
+};
+
 function offersFromItems(src, page, knownBrands, skipped) {
   const skip = (why) => { skipped[why] = (skipped[why] || 0) + 1; };
   const out = [];
@@ -228,11 +282,18 @@ const ADAPTERS = {
       .sort((a, b) => (checked[a] ?? -1) - (checked[b] ?? -1) || rank(a) - rank(b))
       .slice(0, budget);
     const pages = [];
+    const expand = src.allSizes && SIZE_EXPANDERS[src.pageFormat];
     for (const key of due) {
       const pageUrl = shopifyJs ? `${src.base}/products/${key}.js` : byKey.get(key).url;
-      const body = await fetchWithRetry(pageUrl, throttle, shopifyJs ? 'application/json' : 'text/html').catch(() => null);
+      const got = await fetchWithRetry(pageUrl, throttle, shopifyJs ? 'application/json' : 'text/html', 6, { full: !!expand }).catch(() => null);
       checked[key] = dayNum(today);
+      const body = expand ? got?.text : got;
       if (!body) continue;
+      if (expand) {
+        const { url, category } = byKey.get(key);
+        pages.push({ key, category, items: await expand(src, { html: body, cookie: got.cookie, url }, throttle) });
+        continue;
+      }
       if (shopifyJs) {
         let p;
         try { p = JSON.parse(body); } catch { continue; }
@@ -246,8 +307,9 @@ const ADAPTERS = {
     }
     const fresh = new Set(due);
     const keyOf = (url) => url.match(new RegExp(src.idPattern))?.[1];
+    // `minSeen` retires offers recorded before a parser fix (they'd otherwise linger up to maxAgeDays).
     const carried = previousAll.filter((o) => o.src === src.id && !fresh.has(keyOf(o.url)) && byKey.has(keyOf(o.url)) &&
-      dayNum(today) - dayNum(o.seen) <= src.maxAgeDays);
+      dayNum(today) - dayNum(o.seen) <= src.maxAgeDays && (!src.minSeen || o.seen >= src.minSeen));
     const coverage = Object.keys(checked).filter((k) => byKey.has(k)).length;
     const skipped = {};
     const fromPage = (p, knownBrands) => (shopifyJs
