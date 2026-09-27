@@ -54,7 +54,8 @@ for (const post of reddit.posts) {
 }
 
 // Re-apply the "not a perfume" filter so filter tweaks apply without re-scraping (sets, lotions).
-const all = [...scraped.offers, ...redditOffers].filter((o) => !isNotPerfume(o.name));
+// Offers must link to an http(s) page (scraped URLs are untrusted input).
+const all = [...scraped.offers, ...redditOffers].filter((o) => !isNotPerfume(o.name) && /^https?:\/\//i.test(o.url || ''));
 
 // MaxAroma offers stored before its brand fix all say "27 87" (the first entry of the site's brand
 // menu). Its product URLs start with the house ("/christian-dior-sauvage-for-men/"), so recover the

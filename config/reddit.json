@@ -1,0 +1,8 @@
+{
+  "_comment": "Reddit import rules. Posts from other subreddits need the maintainer's 'override' label.",
+  "allowedSubreddits": ["fragranceswap", "fragrancesplits", "DecantHouse", "Perfumeswap"],
+  "maxPostAgeDays": 30,
+  "siteIndexUrl": "https://tucana1.github.io/scent-prices/data/index.json",
+  "minShareOfShopPrice": 0.33,
+  "maxSuspiciousShare": 0.3
+}

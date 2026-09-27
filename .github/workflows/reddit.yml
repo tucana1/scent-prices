@@ -1,6 +1,9 @@
 # Imports prices from a Reddit post submitted through the site (which opens an issue).
 # Runs automatically for issues opened by the repo owner/collaborators; anyone else's
 # submission waits until a maintainer adds the "approved" label (keeps API spend in your hands).
+# Every post is screened (subreddit allowlist, age, LLM sale/scam review, price sanity). Rejected
+# posts get a "rejected" or "needs-review" label; a maintainer's "override" label imports anyway.
+# Only maintainers can add labels, so only they can trigger or override an import.
 name: Import Reddit post
 on:
   issues:
@@ -24,17 +27,21 @@ jobs:
       github.event.issue.state == 'open' &&
       ((github.event.action == 'opened' &&
         contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association)) ||
-       (github.event.action == 'labeled' && github.event.label.name == 'approved'))
+       (github.event.action == 'labeled' && contains(fromJSON('["approved","override"]'), github.event.label.name)))
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          # The import step handles untrusted text; don't leave a push token in .git/config for it.
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with: { node-version: 22 }
-      - name: Extract prices with LLM
+      - name: Review and extract prices with LLM
         id: extract
         continue-on-error: true
         env:
-          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_BODY: ${{ github.event.issue.body }}   # passed as data via env, never interpolated into the script
+          OVERRIDE: ${{ github.event.label.name == 'override' && '1' || '0' }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
           REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
@@ -44,6 +51,7 @@ jobs:
         run: |
           git config user.name "price-bot"
           git config user.email "price-bot@users.noreply.github.com"
+          gh auth setup-git   # push with the job token only in this step
           git add data/reddit.json
           git commit -m "Reddit prices from issue #${{ github.event.issue.number }}"
           git pull --rebase && git push
@@ -53,5 +61,8 @@ jobs:
         if: always()
         env: { GH_TOKEN: '${{ github.token }}' }
         run: |
-          gh issue comment ${{ github.event.issue.number }} --body-file build/reddit-summary.md
-          if [ "${{ steps.extract.outcome }}" = "success" ]; then gh issue close ${{ github.event.issue.number }}; fi
+          N=${{ github.event.issue.number }}
+          gh issue comment "$N" --body-file build/reddit-summary.md
+          LABEL=$(cat build/reddit-label.txt 2>/dev/null || true)
+          case "$LABEL" in rejected|needs-review) gh issue edit "$N" --add-label "$LABEL" ;; esac
+          if [ "${{ steps.extract.outcome }}" = "success" ]; then gh issue close "$N"; fi

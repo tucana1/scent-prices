@@ -1,6 +1,8 @@
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const money = (n) => `$${n.toFixed(2)}`;
+// Links come from scraped shop data and Reddit: only ever render http(s) ones.
+const safeUrl = (u) => (/^https?:\/\//i.test(String(u || '')) ? esc(u) : '#');
 const ascii = (s) => s.normalize('NFKD').replace(/[̀-ͯ]/g, '');
 // Must match scripts/lib/normalize.js, since ids are recomputed here from the index rows.
 const slug = (s) => ascii(s).toLowerCase().replace(/['’]/g, '').replace(/&/g, ' ').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -131,7 +133,7 @@ function openShops(first) {
   $('#shopsList').innerHTML = groups.map(([, title, test]) => {
     const list = Object.values(index.sources).filter((s) => test(s.kind)).sort((a, b) => (b.n || 0) - (a.n || 0) || a.name.localeCompare(b.name));
     return `<h2>${title} <span class="dim">(${list.length})</span></h2>
-      <ul class="shops">${list.map((s) => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener nofollow">${esc(s.name)}</a>${s.kind === 'mixed' ? ' <span class="tag">bottles + samples</span>' : ''}${s.vouch?.length ? ` <span class="vouch">${s.vouch.map((v) => `<a href="${esc(v.url)}" target="_blank" rel="noopener nofollow" title="Independent reviews">${esc(v.label)}</a>`).join(' · ')}</span>` : ''}${s.n ? `<span class="dim">${s.n.toLocaleString()} fragrances</span>` : ''}</li>`).join('')}</ul>`;
+      <ul class="shops">${list.map((s) => `<li><a href="${safeUrl(s.url)}" target="_blank" rel="noopener nofollow">${esc(s.name)}</a>${s.kind === 'mixed' ? ' <span class="tag">bottles + samples</span>' : ''}${s.vouch?.length ? ` <span class="vouch">${s.vouch.map((v) => `<a href="${safeUrl(v.url)}" target="_blank" rel="noopener nofollow" title="Independent reviews">${esc(v.label)}</a>`).join(' · ')}</span>` : ''}${s.n ? `<span class="dim">${s.n.toLocaleString()} fragrances</span>` : ''}</li>`).join('')}</ul>`;
   }).join('') + `<p class="small dim">Plus Reddit decant splits and sales that people submit. Decant shops are only listed when independent buyers vouch for them; the links next to each name are that evidence.</p>`;
   $('#shopsDlg').showModal();
 }
@@ -249,7 +251,7 @@ async function showPerfume(id) {
             <td>${sourceCell(o)}</td>
             <td class="num">${money(o.price)}</td>
             <td class="num dim">${money(o.price / o.ml)}/ml</td>
-            <td class="go"><a href="${esc(o.url)}" target="_blank" rel="noopener nofollow">View →</a></td>
+            <td class="go"><a href="${safeUrl(o.url)}" target="_blank" rel="noopener nofollow">View →</a></td>
           </tr>`).join('')}</tbody></table>
       </div>`;
   }).join('');
@@ -268,7 +270,7 @@ async function showPerfume(id) {
         <td class="num">${o.ml} ml</td>
         <td class="num">${money(o.price)}</td>
         <td class="num dim">${money(o.price / o.ml)}/ml</td>
-        <td class="go"><a href="${esc(o.url)}" target="_blank" rel="noopener nofollow">View →</a></td>
+        <td class="go"><a href="${safeUrl(o.url)}" target="_blank" rel="noopener nofollow">View →</a></td>
       </tr>`).join('');
   const decantHtml = p.decants.length ? `
     <h2 class="sec" id="decants">Decants <span class="dim">${sizePref === 'any' ? 'all sizes, sorted by price per ml' : `${label}, sorted by price`}</span></h2>
