@@ -6,7 +6,7 @@
    "author": "aRosySpell",
    "subreddit": "fragranceswap",
    "postedAt": "2026-09-26T23:05:44.000Z",
-   "importedAt": "2026-09-27T01:54:07.315Z",
+   "importedAt": "2026-09-27T05:18:17.326Z",
    "items": [
     {
      "brand": "19-69",
@@ -2767,7 +2767,7 @@
      "concentration": "",
      "kind": "decant",
      "ml": 2,
-     "name": "TEMPO",
+     "name": "Tempo",
      "note": "",
      "price": 14
     },
@@ -2776,7 +2776,7 @@
      "concentration": "",
      "kind": "decant",
      "ml": 5,
-     "name": "TEMPO",
+     "name": "Tempo",
      "note": "",
      "price": 22
     },
@@ -2785,7 +2785,7 @@
      "concentration": "",
      "kind": "decant",
      "ml": 10,
-     "name": "TEMPO",
+     "name": "Tempo",
      "note": "",
      "price": 41
     },
@@ -2848,7 +2848,7 @@
      "concentration": "",
      "kind": "decant",
      "ml": 2,
-     "name": "Skin [Intense]",
+     "name": "Skin Intense",
      "note": "",
      "price": 8.5
     },
@@ -2857,7 +2857,7 @@
      "concentration": "",
      "kind": "decant",
      "ml": 5,
-     "name": "Skin [Intense]",
+     "name": "Skin Intense",
      "note": "",
      "price": 13
     },
@@ -2866,7 +2866,7 @@
      "concentration": "",
      "kind": "decant",
      "ml": 10,
-     "name": "Skin [Intense]",
+     "name": "Skin Intense",
      "note": "",
      "price": 24.5
     },
@@ -3289,8 +3289,8 @@
      "concentration": "",
      "kind": "decant",
      "ml": 2,
-     "name": "Say Less",
-     "note": "AZ Exclusive",
+     "name": "Say Less (AZ Exclusive)",
+     "note": "",
      "price": 17
     },
     {
@@ -3298,8 +3298,8 @@
      "concentration": "",
      "kind": "decant",
      "ml": 5,
-     "name": "Say Less",
-     "note": "AZ Exclusive",
+     "name": "Say Less (AZ Exclusive)",
+     "note": "",
      "price": 30.5
     },
     {
@@ -3838,8 +3838,8 @@
      "concentration": "Parfum",
      "kind": "decant",
      "ml": 2,
-     "name": "Feather",
-     "note": "羽化仙",
+     "name": "Feather 羽化仙",
+     "note": "",
      "price": 27.5
     },
     {
@@ -3847,8 +3847,8 @@
      "concentration": "Parfum",
      "kind": "decant",
      "ml": 5,
-     "name": "Feather",
-     "note": "羽化仙",
+     "name": "Feather 羽化仙",
+     "note": "",
      "price": 50
     },
     {
@@ -4234,8 +4234,8 @@
      "concentration": "",
      "kind": "decant",
      "ml": 2,
-     "name": "Apollo",
-     "note": "FM The Moon Dupe",
+     "name": "Apollo (FM The Moon Dupe)",
+     "note": "",
      "price": 8.25
     },
     {
@@ -4243,8 +4243,8 @@
      "concentration": "",
      "kind": "decant",
      "ml": 5,
-     "name": "Apollo",
-     "note": "FM The Moon Dupe",
+     "name": "Apollo (FM The Moon Dupe)",
+     "note": "",
      "price": 15
     },
     {
@@ -4338,7 +4338,7 @@
      "price": 12
     },
     {
-     "brand": "Parfums Dusita",
+     "brand": "Dusita Parfums",
      "concentration": "",
      "kind": "decant",
      "ml": 2,
@@ -4347,7 +4347,7 @@
      "price": 11.75
     },
     {
-     "brand": "Parfums Dusita",
+     "brand": "Dusita Parfums",
      "concentration": "",
      "kind": "decant",
      "ml": 5,
@@ -4356,7 +4356,7 @@
      "price": 18.5
     },
     {
-     "brand": "Parfums Dusita",
+     "brand": "Dusita Parfums",
      "concentration": "",
      "kind": "decant",
      "ml": 10,
@@ -5476,7 +5476,7 @@
      "concentration": "",
      "kind": "decant",
      "ml": 2,
-     "name": "Bottled Absolu",
+     "name": "Boss Bottled Absolu",
      "note": "",
      "price": 7.75
     },
@@ -5485,7 +5485,7 @@
      "concentration": "",
      "kind": "decant",
      "ml": 5,
-     "name": "Bottled Absolu",
+     "name": "Boss Bottled Absolu",
      "note": "",
      "price": 12
     },
@@ -5494,7 +5494,7 @@
      "concentration": "",
      "kind": "decant",
      "ml": 10,
-     "name": "Bottled Absolu",
+     "name": "Boss Bottled Absolu",
      "note": "",
      "price": 22.5
     },
@@ -6268,7 +6268,7 @@
      "concentration": "",
      "kind": "decant",
      "ml": 2,
-     "name": "GoodGirl Gone Bad Extreme",
+     "name": "Good Girl Gone Bad Extreme",
      "note": "",
      "price": 21.75
     },
@@ -6277,7 +6277,7 @@
      "concentration": "",
      "kind": "decant",
      "ml": 5,
-     "name": "GoodGirl Gone Bad Extreme",
+     "name": "Good Girl Gone Bad Extreme",
      "note": "",
      "price": 34
     },
@@ -6286,7 +6286,7 @@
      "concentration": "",
      "kind": "decant",
      "ml": 10,
-     "name": "GoodGirl Gone Bad Extreme",
+     "name": "Good Girl Gone Bad Extreme",
      "note": "",
      "price": 64.5
     },
@@ -6727,8 +6727,8 @@
      "concentration": "",
      "kind": "decant",
      "ml": 2,
-     "name": "Sun Song",
-     "note": "2025",
+     "name": "Sun Song (2025)",
+     "note": "",
      "price": 15.25
     },
     {
@@ -6736,8 +6736,8 @@
      "concentration": "",
      "kind": "decant",
      "ml": 5,
-     "name": "Sun Song",
-     "note": "2025",
+     "name": "Sun Song (2025)",
+     "note": "",
      "price": 23.5
     },
     {
@@ -6745,8 +6745,8 @@
      "concentration": "",
      "kind": "decant",
      "ml": 10,
-     "name": "Sun Song",
-     "note": "2025",
+     "name": "Sun Song (2025)",
+     "note": "",
      "price": 44.5
     },
     {
@@ -7984,29 +7984,29 @@
     },
     {
      "brand": "Paco Rabanne",
-     "concentration": "",
+     "concentration": "Parfum",
      "kind": "decant",
      "ml": 2,
-     "name": "Invictus Victory Elixir Parfum Intense",
-     "note": "",
+     "name": "Invictus Victory Elixir",
+     "note": "Parfum Intense",
      "price": 6.25
     },
     {
      "brand": "Paco Rabanne",
-     "concentration": "",
+     "concentration": "Parfum",
      "kind": "decant",
      "ml": 5,
-     "name": "Invictus Victory Elixir Parfum Intense",
-     "note": "",
+     "name": "Invictus Victory Elixir",
+     "note": "Parfum Intense",
      "price": 9.5
     },
     {
      "brand": "Paco Rabanne",
-     "concentration": "",
+     "concentration": "Parfum",
      "kind": "decant",
      "ml": 10,
-     "name": "Invictus Victory Elixir Parfum Intense",
-     "note": "",
+     "name": "Invictus Victory Elixir",
+     "note": "Parfum Intense",
      "price": 17.5
     },
     {
@@ -8905,8 +8905,8 @@
      "concentration": "",
      "kind": "decant",
      "ml": 2,
-     "name": "Mourningstar (Unreleased)",
-     "note": "",
+     "name": "Mourningstar",
+     "note": "Unreleased",
      "price": 6.75
     },
     {
@@ -8914,8 +8914,8 @@
      "concentration": "",
      "kind": "decant",
      "ml": 5,
-     "name": "Mourningstar (Unreleased)",
-     "note": "",
+     "name": "Mourningstar",
+     "note": "Unreleased",
      "price": 10.5
     },
     {
@@ -8923,8 +8923,8 @@
      "concentration": "",
      "kind": "decant",
      "ml": 10,
-     "name": "Mourningstar (Unreleased)",
-     "note": "",
+     "name": "Mourningstar",
+     "note": "Unreleased",
      "price": 19.5
     },
     {
@@ -9547,15 +9547,6 @@
      "name": "Jany",
      "note": "",
      "price": 72.5
-    },
-    {
-     "brand": "",
-     "concentration": "",
-     "kind": "decant",
-     "ml": 2,
-     "name": "Ephemera",
-     "note": "",
-     "price": 12.75
     },
     {
      "brand": "Sospiro",
@@ -10278,7 +10269,7 @@
      "price": 16
     },
     {
-     "brand": "Viktor&Rolf",
+     "brand": "Viktor & Rolf",
      "concentration": "",
      "kind": "decant",
      "ml": 2,
@@ -10287,7 +10278,7 @@
      "price": 6.25
     },
     {
-     "brand": "Viktor&Rolf",
+     "brand": "Viktor & Rolf",
      "concentration": "",
      "kind": "decant",
      "ml": 5,
@@ -10296,7 +10287,7 @@
      "price": 9.5
     },
     {
-     "brand": "Viktor&Rolf",
+     "brand": "Viktor & Rolf",
      "concentration": "",
      "kind": "decant",
      "ml": 10,
@@ -10612,28 +10603,28 @@
     },
     {
      "brand": "Yves Saint Laurent",
-     "concentration": "Parfum",
+     "concentration": "",
      "kind": "decant",
      "ml": 2,
-     "name": "Black Opium",
+     "name": "Black Opium Le Parfum",
      "note": "",
      "price": 7.75
     },
     {
      "brand": "Yves Saint Laurent",
-     "concentration": "Parfum",
+     "concentration": "",
      "kind": "decant",
      "ml": 5,
-     "name": "Black Opium",
+     "name": "Black Opium Le Parfum",
      "note": "",
      "price": 12
     },
     {
      "brand": "Yves Saint Laurent",
-     "concentration": "Parfum",
+     "concentration": "",
      "kind": "decant",
      "ml": 10,
-     "name": "Black Opium",
+     "name": "Black Opium Le Parfum",
      "note": "",
      "price": 22.5
     },
@@ -10693,28 +10684,28 @@
     },
     {
      "brand": "Yves Saint Laurent",
-     "concentration": "Parfum",
+     "concentration": "",
      "kind": "decant",
      "ml": 2,
-     "name": "La Nuit de L'Homme",
+     "name": "La Nuit de L'Homme Le Parfum",
      "note": "",
      "price": 6.75
     },
     {
      "brand": "Yves Saint Laurent",
-     "concentration": "Parfum",
+     "concentration": "",
      "kind": "decant",
      "ml": 5,
-     "name": "La Nuit de L'Homme",
+     "name": "La Nuit de L'Homme Le Parfum",
      "note": "",
      "price": 10.5
     },
     {
      "brand": "Yves Saint Laurent",
-     "concentration": "Parfum",
+     "concentration": "",
      "kind": "decant",
      "ml": 10,
-     "name": "La Nuit de L'Homme",
+     "name": "La Nuit de L'Homme Le Parfum",
      "note": "",
      "price": 19.5
     },
@@ -10846,28 +10837,28 @@
     },
     {
      "brand": "Yves Saint Laurent",
-     "concentration": "Parfum",
+     "concentration": "",
      "kind": "decant",
      "ml": 2,
-     "name": "Y",
+     "name": "Y Le Parfum",
      "note": "Pre 2025",
      "price": 6.25
     },
     {
      "brand": "Yves Saint Laurent",
-     "concentration": "Parfum",
+     "concentration": "",
      "kind": "decant",
      "ml": 5,
-     "name": "Y",
+     "name": "Y Le Parfum",
      "note": "Pre 2025",
      "price": 9.5
     },
     {
      "brand": "Yves Saint Laurent",
-     "concentration": "Parfum",
+     "concentration": "",
      "kind": "decant",
      "ml": 10,
-     "name": "Y",
+     "name": "Y Le Parfum",
      "note": "Pre 2025",
      "price": 17.5
     },
@@ -10930,8 +10921,8 @@
      "concentration": "",
      "kind": "decant",
      "ml": 2,
-     "name": "Odyssey Mandarin Sky",
-     "note": "Jean Paul Gaultier Scandal",
+     "name": "Odyssey Mandarin Sky (JPG Scandal)",
+     "note": "",
      "price": 3
     },
     {
@@ -10939,8 +10930,8 @@
      "concentration": "",
      "kind": "decant",
      "ml": 5,
-     "name": "Odyssey Mandarin Sky",
-     "note": "Jean Paul Gaultier Scandal",
+     "name": "Odyssey Mandarin Sky (JPG Scandal)",
+     "note": "",
      "price": 5
     },
     {
@@ -10948,8 +10939,8 @@
      "concentration": "",
      "kind": "decant",
      "ml": 10,
-     "name": "Odyssey Mandarin Sky",
-     "note": "Jean Paul Gaultier Scandal",
+     "name": "Odyssey Mandarin Sky (JPG Scandal)",
+     "note": "",
      "price": 8
     },
     {
@@ -10957,8 +10948,8 @@
      "concentration": "",
      "kind": "decant",
      "ml": 2,
-     "name": "Odyssey Limoni Fresh Edition",
-     "note": "Imagination/AS",
+     "name": "Odyssey Limoni Fresh Edition (Imagination/AS)",
+     "note": "",
      "price": 3
     },
     {
@@ -10966,8 +10957,8 @@
      "concentration": "",
      "kind": "decant",
      "ml": 5,
-     "name": "Odyssey Limoni Fresh Edition",
-     "note": "Imagination/AS",
+     "name": "Odyssey Limoni Fresh Edition (Imagination/AS)",
+     "note": "",
      "price": 5
     },
     {
@@ -10975,8 +10966,8 @@
      "concentration": "",
      "kind": "decant",
      "ml": 10,
-     "name": "Odyssey Limoni Fresh Edition",
-     "note": "Imagination/AS",
+     "name": "Odyssey Limoni Fresh Edition (Imagination/AS)",
+     "note": "",
      "price": 8
     },
     {
@@ -10984,8 +10975,8 @@
      "concentration": "",
      "kind": "decant",
      "ml": 2,
-     "name": "Elegance",
-     "note": "BN9 Greenwich Village",
+     "name": "Elegance (BN9 Greenwich Village)",
+     "note": "",
      "price": 3.5
     },
     {
@@ -10993,8 +10984,8 @@
      "concentration": "",
      "kind": "decant",
      "ml": 5,
-     "name": "Elegance",
-     "note": "BN9 Greenwich Village",
+     "name": "Elegance (BN9 Greenwich Village)",
+     "note": "",
      "price": 5.5
     },
     {
@@ -11002,8 +10993,8 @@
      "concentration": "",
      "kind": "decant",
      "ml": 10,
-     "name": "Elegance",
-     "note": "BN9 Greenwich Village",
+     "name": "Elegance (BN9 Greenwich Village)",
+     "note": "",
      "price": 8.5
     },
     {
@@ -11011,8 +11002,8 @@
      "concentration": "EDP",
      "kind": "decant",
      "ml": 2,
-     "name": "Essence",
-     "note": "Bianco Latte",
+     "name": "Essence (Bianco Latte)",
+     "note": "",
      "price": 3.5
     },
     {
@@ -11020,8 +11011,8 @@
      "concentration": "EDP",
      "kind": "decant",
      "ml": 5,
-     "name": "Essence",
-     "note": "Bianco Latte",
+     "name": "Essence (Bianco Latte)",
+     "note": "",
      "price": 5.5
     },
     {
@@ -11029,8 +11020,8 @@
      "concentration": "EDP",
      "kind": "decant",
      "ml": 10,
-     "name": "Essence",
-     "note": "Bianco Latte",
+     "name": "Essence (Bianco Latte)",
+     "note": "",
      "price": 8.5
     },
     {
@@ -11038,8 +11029,8 @@
      "concentration": "",
      "kind": "decant",
      "ml": 2,
-     "name": "King",
-     "note": "Erba Pura",
+     "name": "King (Erba Pura)",
+     "note": "",
      "price": 3.5
     },
     {
@@ -11047,8 +11038,8 @@
      "concentration": "",
      "kind": "decant",
      "ml": 5,
-     "name": "King",
-     "note": "Erba Pura",
+     "name": "King (Erba Pura)",
+     "note": "",
      "price": 5.5
     },
     {
@@ -11056,8 +11047,8 @@
      "concentration": "",
      "kind": "decant",
      "ml": 10,
-     "name": "King",
-     "note": "Erba Pura",
+     "name": "King (Erba Pura)",
+     "note": "",
      "price": 8.5
     },
     {
@@ -11065,8 +11056,8 @@
      "concentration": "",
      "kind": "decant",
      "ml": 2,
-     "name": "Mashrabya",
-     "note": "Kilian Smoking Hot",
+     "name": "Mashrabya (Kilian Smoking Hot)",
+     "note": "",
      "price": 3
     },
     {
@@ -11074,8 +11065,8 @@
      "concentration": "",
      "kind": "decant",
      "ml": 5,
-     "name": "Mashrabya",
-     "note": "Kilian Smoking Hot",
+     "name": "Mashrabya (Kilian Smoking Hot)",
+     "note": "",
      "price": 5
     },
     {
@@ -11083,8 +11074,8 @@
      "concentration": "",
      "kind": "decant",
      "ml": 10,
-     "name": "Mashrabya",
-     "note": "Kilian Smoking Hot",
+     "name": "Mashrabya (Kilian Smoking Hot)",
+     "note": "",
      "price": 8
     },
     {
@@ -11092,8 +11083,8 @@
      "concentration": "EDP",
      "kind": "decant",
      "ml": 2,
-     "name": "La Yuqawam",
-     "note": "Tom Ford Tuscan Leather",
+     "name": "La Yuqawam (TF Tuscan Leather)",
+     "note": "",
      "price": 3
     },
     {
@@ -11101,8 +11092,8 @@
      "concentration": "EDP",
      "kind": "decant",
      "ml": 5,
-     "name": "La Yuqawam",
-     "note": "Tom Ford Tuscan Leather",
+     "name": "La Yuqawam (TF Tuscan Leather)",
+     "note": "",
      "price": 5
     },
     {
@@ -11110,8 +11101,8 @@
      "concentration": "EDP",
      "kind": "decant",
      "ml": 10,
-     "name": "La Yuqawam",
-     "note": "Tom Ford Tuscan Leather",
+     "name": "La Yuqawam (TF Tuscan Leather)",
+     "note": "",
      "price": 8
     },
     {
@@ -11119,8 +11110,8 @@
      "concentration": "",
      "kind": "decant",
      "ml": 2,
-     "name": "Tiramisu Caramel",
-     "note": "Bianco Latte",
+     "name": "Tiramisu Caramel (Bianco Latte)",
+     "note": "",
      "price": 3
     },
     {
@@ -11128,8 +11119,8 @@
      "concentration": "",
      "kind": "decant",
      "ml": 5,
-     "name": "Tiramisu Caramel",
-     "note": "Bianco Latte",
+     "name": "Tiramisu Caramel (Bianco Latte)",
+     "note": "",
      "price": 5
     },
     {
@@ -11137,8 +11128,8 @@
      "concentration": "",
      "kind": "decant",
      "ml": 10,
-     "name": "Tiramisu Caramel",
-     "note": "Bianco Latte",
+     "name": "Tiramisu Caramel (Bianco Latte)",
+     "note": "",
      "price": 8
     }
    ]
