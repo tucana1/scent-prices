@@ -11,12 +11,14 @@ permissions:
   issues: write
   actions: write     # to kick off the site rebuild
 
-concurrency:
-  group: data
-  cancel-in-progress: false
-
 jobs:
   import:
+    # Concurrency lives on the job, not the workflow: a submission fires both "opened" and
+    # "labeled", and GitHub keeps only the newest *pending* run per group. At workflow level the
+    # no-op "labeled" run would replace the real "opened" import while a price update is running.
+    concurrency:
+      group: data
+      cancel-in-progress: false
     if: >-
       startsWith(github.event.issue.title, 'Reddit prices:') &&
       github.event.issue.state == 'open' &&
