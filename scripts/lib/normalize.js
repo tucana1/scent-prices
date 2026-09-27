@@ -5,7 +5,7 @@
 const BRAND_ALIASES = {
   'christian dior': 'Dior', 'dior': 'Dior',
   'yves saint laurent': 'Yves Saint Laurent', 'ysl': 'Yves Saint Laurent', 'saint laurent': 'Yves Saint Laurent',
-  'giorgio armani': 'Giorgio Armani', 'armani': 'Giorgio Armani', 'emporio armani': 'Emporio Armani',
+  'giorgio armani': 'Giorgio Armani', 'armani': 'Giorgio Armani', 'emporio armani': 'Giorgio Armani',
   'maison francis kurkdjian': 'Maison Francis Kurkdjian', 'mfk': 'Maison Francis Kurkdjian', 'francis kurkdjian': 'Maison Francis Kurkdjian',
   'maison francis kurkdijian': 'Maison Francis Kurkdjian', 'maison francis kurkdjian mfk': 'Maison Francis Kurkdjian',
   'xerjoff join the club': 'Xerjoff', 'xerjoff shooting stars': 'Xerjoff', 'xj': 'Xerjoff',
@@ -20,12 +20,12 @@ const BRAND_ALIASES = {
   'hermes': 'Hermes', 'bvlgari': 'Bvlgari', 'bulgari': 'Bvlgari',
   'lancome': 'Lancome', 'parfums de marly': 'Parfums de Marly', 'pdm': 'Parfums de Marly',
   'hugo boss': 'Hugo Boss', 'boss': 'Hugo Boss',
-  'tom ford': 'Tom Ford', 'creed': 'Creed', 'le labo': 'Le Labo', 'maison margiela': 'Maison Margiela',
+  'tom ford': 'Tom Ford', 'tom ford private blend': 'Tom Ford', 'tom ford beauty': 'Tom Ford', 'creed': 'Creed', 'le labo': 'Le Labo', 'maison margiela': 'Maison Margiela',
   'al haramain': 'Al Haramain', 'al haramain perfumes': 'Al Haramain',
   'carolina herrera': 'Carolina Herrera', 'prada': 'Prada', 'versace': 'Versace', 'chanel': 'Chanel',
   'givenchy': 'Givenchy', 'guerlain': 'Guerlain', 'valentino': 'Valentino', 'burberry': 'Burberry',
   'azzaro': 'Azzaro', 'initio': 'Initio', 'initio parfums prives': 'Initio', 'xerjoff': 'Xerjoff',
-  'lattafa': 'Lattafa', 'lattafa perfumes': 'Lattafa', 'armaf': 'Armaf', 'rasasi': 'Rasasi', 'afnan': 'Afnan',
+  'lattafa': 'Lattafa', 'lattafa perfumes': 'Lattafa', 'lataffa': 'Lattafa', 'armaf': 'Armaf', 'rasasi': 'Rasasi', 'afnan': 'Afnan',
   'nishane': 'Nishane', 'amouage': 'Amouage', 'byredo': 'Byredo', 'diptyque': 'Diptyque',
   'mancera': 'Mancera', 'montale': 'Montale',
   'yvessaintlaurent': 'Yves Saint Laurent', 'roja london': 'Roja Parfums', 'jo malone london': 'Jo Malone', 'jo malone': 'Jo Malone',
@@ -39,7 +39,7 @@ const BRAND_SUFFIX = /\s+(parfums?|perfumes?|fragrances?|paris|london|milano|new
 const BY_BRANDS = new Set(['by terry', 'by far', 'by rosie jane', 'by lilly', 'by kilian']);
 
 // Things that are not a bottle of perfume. Checked against title + variant.
-const NOT_PERFUME = /\b(gift ?set|travel set|discovery set|sets?|set of|\d+ ?(pc|pcs|piece)|coffret|lotion|shower|gel|deodorant|deo stick|after ?shave|balm|body (wash|mist|spray|cream|oil)|hair (mist|perfume)|soap|candle|diffuser|discovery|sampler|refill(s)?|bundle|kit|pouch|case|wallet|atomizer only|empty|subscription|gift ?card|mystery|surprise)\b/i;
+const NOT_PERFUME = /\b(gift ?set|travel set|discovery set|sets?|set of|\d+ ?(pc|pcs|piece)|coffret|lotion|shower|gel|deodorant|deo stick|after ?shave|balm|body (wash|mist|spray|cream|oil)|hair (mist|perfume)|soap|candle|diffuser|discovery|sampler|refill(s)?|bundle|kit|pouch|case|wallet|atomizer only|empty|subscription|gift ?card|mystery|surprise|cream|air fresh(e)?ner|car freshener|incense|bakhoor|bakhour)\b/i;
 
 const OZ_TO_ML = { 0.17: 5, 0.2: 6, 0.25: 7.5, 0.27: 8, 0.3: 9, 0.33: 10, 0.34: 10, 0.5: 15, 0.67: 20, 0.68: 20, 1: 30, 1.3: 40, 1.4: 40, 1.6: 50, 1.7: 50, 2: 60, 2.5: 75, 2.7: 80, 3: 90, 3.3: 100, 3.4: 100, 3.6: 110, 4: 120, 4.2: 125, 5: 150, 6.7: 200, 6.8: 200, 8: 250, 8.4: 250, 10: 300 };
 
@@ -121,11 +121,12 @@ export function fragranceName(title, brand, vendor) {
   }
   t = t
     // Award/listing chatter some shops append ("2017 voted one of best releases", "last call").
-    .replace(/\b((19|20)\d{2} )?(voted|finalist|foundation|basenotes|last call)\b.*$/, ' ')
+    .replace(/\b((19|20)\d{2} )?(voted|finalist|foundation|basenotes|last call|\d star rating|in the guide)\b.*$/, ' ')
+    .replace(/\babsolu de parfum\b/g, 'absolu').replace(/\babsolu de\s*$/, 'absolu ')
     .replace(/\b\d*\.?\d+\s*(ml|oz|fl oz|fl)\b/g, ' ')
     // "Le Parfum" / "Elixir de Parfum" style names keep the word; plain "Parfum" is concentration.
     .replace(/\b(extrait de parfum|eau de parfum|eau de toilette|eau de cologne|eau fraiche|edp|edt|edc|extrait|parfum intense|(?<!\ble )parfum)\b/g, (m) => (m === 'parfum intense' ? 'intense' : ' '))
-    .replace(/\b(spray|splash|vaporisateur|natural|perfumes?|colognes?|fragrances?|scent|tester|unboxed|new|box item|in box|brand without box|without box|no box|samples?|decants?|split|retail bottle|travel spray|travel size|xl|manufacturer|(19|20)\d{2} bottle|decantx|perfume cologne decant fragrance samples|private blend|private line|manufacturer boxed|boxed|glass sample vial|sample vial|glass spray|vial|mini|\d{4}s batch|\d{4} batch|boxed|for (men|women|man|woman|him|her|unisex)|mens|womens|unisex|men|women|man|woman|by)\b/g, ' ')
+    .replace(/\b(spray|splash|vaporisateur|natural|perfumes?|colognes?|fragrances?|scent|tester|unboxed|new|box item|in box|brand without box|without box|no box|samples?|decants?|split|retail bottle|travel spray|travel size|xl|manufacturer|(19|20)\d{2}s? bottle|\d+x plus \d+ free|decantx|perfume cologne decant fragrance samples|private blend|private line|manufacturer boxed|boxed|glass sample vial|sample vial|glass spray|vial|mini|\d{4}s batch|\d{4} batch|boxed|for (men|women|man|woman|him|her|unisex)|mens|womens|unisex|men|women|man|woman|by)\b/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
     .replace(/\b(\w+)( \1\b)+/g, '$1'); // "elixir intense intense" -> "elixir intense"
@@ -137,6 +138,8 @@ export function fragranceName(title, brand, vendor) {
 
 const HOUSE_LINES = {
   Xerjoff: /\b(xj 1861|xj|1861|join the club|shooting stars|oud stars)\b/g,
+  'Tom Ford': /\b(private blend|p)\b/g,
+  'Carolina Herrera': /\bch\b/g,
 };
 
 // The name part ignores spacing and hyphens: "9pm" / "9 Pm", "Torino21" / "Torino 21" are one fragrance.
@@ -176,4 +179,45 @@ export function brandKey(brand) {
   return words(brand).replace(/^by (?!terry$|far$|rosie jane$|lilly$)/, '')
     .replace(/\b(parfums?|perfumes?|fragrances?|paris|london|milano|new york|nyc|beauty|cosmetics|inc|llc|the|co)\b/g, ' ')
     .replace(/\s+/g, '');
+}
+
+// Order-free key for a fragrance name within one house: release years, "edition" and word order
+// don't make a different fragrance ("Absolu Aventus 2025" / "Aventus Absolu" -> "absolu aventus").
+// Numbers that ARE the name ("1872", "212") are kept when nothing else is left.
+// Words shops add inconsistently. NOT here on purpose: eau (Eau Sauvage != Sauvage), vintage,
+// oil, essence (Amouage's Essence versions), which mark genuinely different products.
+const NAME_NOISE = new Set(['edition', 'limited', 'parfums', 'par', 'carded', 'refillable', 'rechargeable', 'collection',
+  'and', 'the', 'masculine', 'feminine', 'replica', 'prive', 'emporio', 'brand', 'in', 'of', 'for', 'de', 'di', 'du']);
+// Spellings shops use interchangeably.
+const NAME_SYNONYMS = { absolute: 'absolu' };
+export function nameKey(name) {
+  const toks = words(name).split(' ').filter(Boolean).map((t) => NAME_SYNONYMS[t] || t);
+  const core = toks.filter((t) => !NAME_NOISE.has(t) && !/^(19|20)\d{2}$/.test(t));
+  return (core.length ? core : toks).sort().join(' ');
+}
+
+// How many filler words a spelling carries (years, "edition", "replica", ...): fewer reads better.
+// Small words ("in", "de", "the") are ignored for matching but belong in the displayed name.
+const KEEP_IN_DISPLAY = new Set(['and', 'the', 'in', 'of', 'for', 'de', 'di', 'du']);
+export function noiseCount(name) {
+  return words(name).split(' ').filter((t) => (NAME_NOISE.has(t) && !KEEP_IN_DISPLAY.has(t)) || /^(19|20)\d{2}$/.test(t)).length;
+}
+
+// One-letter typos in one word ("greenly" / "greenley", "tobacco vanilla" / "vanille"). Only words of
+// 5+ letters without digits, so "Molecule 01/05", "Alexandria II/III", "Gio/Gioia" never collapse.
+export function typoTwin(keyA, keyB) {
+  const a = keyA.split(' '), b = keyB.split(' ');
+  if (a.length !== b.length) return false;
+  const diff = a.map((t, i) => [t, b[i]]).filter(([x, y]) => x !== y);
+  if (diff.length !== 1) return false;
+  const [x, y] = diff[0];
+  if (Math.min(x.length, y.length) < 5 || /\d/.test(x + y)) return false;
+  return editDistance(x, y) === 1;
+}
+function editDistance(a, b) {
+  const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
+  for (let j = 1; j <= b.length; j++) d[0][j] = j;
+  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++)
+    d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  return d[a.length][b.length];
 }

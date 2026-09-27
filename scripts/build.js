@@ -5,7 +5,7 @@
 
 import { readFile, writeFile, mkdir, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { canonicalBrand, concentration, fragranceName, perfumeId, sizeBucket, brandKey, isNotPerfume, brandFromTitle, words } from './lib/normalize.js';
+import { canonicalBrand, concentration, fragranceName, perfumeId, sizeBucket, brandKey, isNotPerfume, brandFromTitle, words, nameKey, noiseCount, typoTwin } from './lib/normalize.js';
 
 const root = new URL('../', import.meta.url);
 const readJson = async (p, fallback) => (existsSync(new URL(p, root)) ? JSON.parse(await readFile(new URL(p, root))) : fallback);
@@ -87,6 +87,52 @@ for (const o of all) {
   o.name = fragranceName(o.name, o.brand, o.brand);
   o.id = perfumeId(o.brand, o.name, o.conc);
 }
+
+// --- Merge spellings of one fragrance within a house --------------------------------------
+// Names with the same words, ignoring order, years and filler, are one fragrance; show the
+// spelling most offers use. (Distinct releases like "10th Anniversary" keep their extra words.)
+// Typo twins within a house fold into the far more common spelling (3x the offers or more).
+const keyCounts = new Map();
+for (const o of all) { const k = `${o.brand}|${nameKey(o.name)}`; keyCounts.set(k, (keyCounts.get(k) || 0) + 1); }
+const keysByBrand = new Map();
+for (const k of keyCounts.keys()) { const b = k.slice(0, k.indexOf('|')); if (!keysByBrand.has(b)) keysByBrand.set(b, []); keysByBrand.get(b).push(k.slice(b.length + 1)); }
+const typoTarget = new Map();
+for (const [b, keys] of keysByBrand) {
+  const byLen = new Map();
+  for (const k of keys) { const n = k.split(' ').length; if (!byLen.has(n)) byLen.set(n, []); byLen.get(n).push(k); }
+  for (const group of byLen.values()) {
+    if (group.length < 2 || group.length > 2000) continue;
+    for (const a of group) for (const c of group) {
+      if (a >= c || !typoTwin(a, c)) continue;
+      const [na, nc] = [keyCounts.get(`${b}|${a}`), keyCounts.get(`${b}|${c}`)];
+      if (na >= 3 * nc) typoTarget.set(`${b}|${c}`, a); else if (nc >= 3 * na) typoTarget.set(`${b}|${a}`, c);
+    }
+  }
+}
+const keyOf = (o) => { const k = `${o.brand}|${nameKey(o.name)}`; return typoTarget.has(k) ? `${o.brand}|${typoTarget.get(k)}` : k; };
+if (process.env.SHOW_MERGES) console.log([...typoTarget].map(([k, v]) => `typo: ${k} -> ${v}`).join('\n'));
+
+const nameVotes = new Map();
+for (const o of all) {
+  const k = keyOf(o);
+  if (!nameVotes.has(k)) nameVotes.set(k, new Map());
+  nameVotes.get(k).set(o.name, (nameVotes.get(k).get(o.name) || 0) + 1);
+}
+const mergedNames = [];
+for (const o of all) {
+  const votes = nameVotes.get(keyOf(o));
+  // Prefer the plain spelling ("liquid brun" over "liquid brun limited edition 2024"), then the common one.
+  const best = [...votes].sort((a, b) => noiseCount(a[0]) - noiseCount(b[0]) || b[1] - a[1] || a[0].length - b[0].length)[0][0];
+  if (best !== o.name) {
+    if (process.env.SHOW_MERGES) mergedNames.push(`${o.brand}: "${o.name}" -> "${best}"`);
+    // Years merge away from the name but stay visible on this shop's price ("Absolu Aventus 2024").
+    const years = (o.name.match(/\b(19|20)\d{2}\b/g) || []).filter((y) => !best.includes(y));
+    if (years.length && !(o.note || '').includes(years[0])) o.note = [o.note, years.join(', ')].filter(Boolean).join(' · ');
+    o.name = best;
+    o.id = perfumeId(o.brand, o.name, o.conc);
+  }
+}
+if (process.env.SHOW_MERGES) console.log([...new Set(mergedNames)].join('\n'));
 
 // --- Fold concentration-less ids into their only concentrated sibling ----------------------
 // "Dior Sauvage" with no EDT/EDP in the title is ambiguous; if only one version exists, use it.
