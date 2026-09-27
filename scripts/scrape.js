@@ -190,7 +190,7 @@ const PAGE_PARSERS = {
 // Shops that price each size through the same request their product page makes when you pick a
 // size. `page` is { html, cookie, url }; returns items like PAGE_PARSERS, one per size.
 const SIZE_EXPANDERS = {
-  async nopcommerce(src, page, throttle) {
+  async nopcommerce(src, page, throttle, meta) {
     const [base] = PAGE_PARSERS.nopcommerce(page.html, page.url);
     const productId = page.html.match(/productdetails_attributechange\/(\d+)\//)?.[1];
     const select = page.html.match(/<select[^>]*name="(product_attribute_\d+)"[\s\S]*?<\/select>/);
@@ -205,7 +205,14 @@ const SIZE_EXPANDERS = {
       let j;
       try { j = JSON.parse(res); } catch { continue; }
       items.push({ ...base, text: `${decodeHtml(label)} ${base.title}`, price: +String(j.price).replace(/[^\d.]/g, ''),
-        inStock: /in stock/i.test(j.stockAvailability || ''), url: page.url });
+        inStock: /in stock/i.test(j.stockAvailability || ''), url: page.url, value });
+    }
+    // Remember ids and per-size prices: later runs re-check stock with one request (see dailyStock).
+    if (meta && items.length) {
+      meta.productId = productId;
+      meta.day = dayNum(today);
+      meta.base = { title: base.title, brand: base.brand };
+      meta.sizes = items.map((it) => [it.value, it.text, it.price]);
     }
     return items;
   },
@@ -281,9 +288,14 @@ const ADAPTERS = {
     }
     const checked = jsonldState[src.id] ||= {};
     const budget = +(process.env.JSONLD_BUDGET || src.dailyBudget);
+    // dailyStock shops (Decant House): full page + per-size prices only for new products or prices
+    // older than priceRefreshDays; every other known product gets a one-request stock check daily.
+    const metaStore = src.dailyStock ? (jsonldState[`${src.id}:meta`] ||= {}) : null;
+    const staleMeta = (k) => !metaStore?.[k]?.day || dayNum(today) - metaStore[k].day >= (src.priceRefreshDays || 7);
     // Oldest-checked first; among never-checked pages, the order of `priority` patterns wins.
     const rank = (k) => { const i = (src.priority || []).findIndex((re) => new RegExp(re).test(byKey.get(k).category)); return i < 0 ? 99 : i; };
     const due = [...byKey.keys()]
+      .filter((k) => !metaStore || staleMeta(k))
       .sort((a, b) => (checked[a] ?? -1) - (checked[b] ?? -1) || rank(a) - rank(b))
       .slice(0, budget);
     const pages = [];
@@ -296,7 +308,9 @@ const ADAPTERS = {
       if (!body) continue;
       if (expand) {
         const { url, category } = byKey.get(key);
-        const items = (await expand(src, { html: body, cookie: got.cookie, url }, throttle)).map((it) => ({ ...it, perSize: true }));
+        const meta = metaStore ? (metaStore[key] ||= {}) : undefined;
+        if (meta) meta.day = dayNum(today); // category/non-product pages too, so they wait a week
+        const items = (await expand(src, { html: body, cookie: got.cookie, url }, throttle, meta)).map((it) => ({ ...it, perSize: true }));
         pages.push({ key, category, items });
         continue;
       }
@@ -312,6 +326,22 @@ const ADAPTERS = {
       }
     }
     const fresh = new Set(due);
+    let stockChecked = 0;
+    if (metaStore) {
+      const dueSet = new Set(due);
+      for (const key of byKey.keys()) {
+        const m = metaStore[key];
+        if (dueSet.has(key) || !m?.sizes) continue;
+        const txt = await fetchWithRetry(`${src.base}/product/combinations?productId=${m.productId}`, throttle, 'application/json', 3).catch(() => null);
+        let combos;
+        try { combos = JSON.parse(txt); } catch { continue; }
+        const inStock = new Map(combos.flatMap((c) => (c.Attributes?.[0]?.ValueIds || []).map((v) => [String(v), !!c.InStock])));
+        const { url, category } = byKey.get(key);
+        pages.push({ key, category, items: m.sizes.map(([value, text, price]) => ({ ...m.base, text, price, inStock: inStock.get(String(value)) ?? false, url, perSize: true })) });
+        fresh.add(key);
+        stockChecked++;
+      }
+    }
     const keyOf = (url) => url.match(new RegExp(src.idPattern))?.[1];
     // `minSeen` retires offers recorded before a parser fix (they'd otherwise linger up to maxAgeDays).
     const carried = previousAll.filter((o) => o.src === src.id && !fresh.has(keyOf(o.url)) && byKey.has(keyOf(o.url)) &&
@@ -325,7 +355,7 @@ const ADAPTERS = {
     return {
       offers: [], scanned: pages.length, deferred: true,
       resolve: (knownBrands) => [...pages.flatMap((p) => fromPage(p, knownBrands)), ...carried],
-      summarize: () => `${due.length} pages checked today, ${coverage}/${byKey.size} checked this cycle, ${carried.length} offers carried forward${Object.keys(skipped).length ? `; skipped ${JSON.stringify(skipped)}` : ''}`,
+      summarize: () => `${due.length} pages checked today${metaStore ? `, stock re-checked for ${stockChecked} more` : ''}, ${coverage}/${byKey.size} checked this cycle, ${carried.length} offers carried forward${Object.keys(skipped).length ? `; skipped ${JSON.stringify(skipped)}` : ''}`,
     };
   },
 

@@ -500,7 +500,7 @@
       "base": "https://www.decanthouse.com",
       "sitemap": "https://www.decanthouse.com/sitemap.xml",
       "idPattern": "decanthouse\\.com/([^/?#]+)$",
-      "dailyBudget": 250,
+      "dailyBudget": 400,
       "maxAgeDays": 10,
       "allSizes": true,
       "rps": 1.5,
@@ -510,7 +510,9 @@
           "label": "Trustpilot 4.9\u2605 \u00b7 1.3k reviews",
           "url": "https://www.trustpilot.com/review/decanthouse.com"
         }
-      ]
+      ],
+      "dailyStock": true,
+      "priceRefreshDays": 7
     },
     {
       "id": "surrendertochance",
