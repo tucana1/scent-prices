@@ -109,6 +109,15 @@ To add a store, add a line to `config/sources.json`. A new Shopify store needs n
 5. Create a label called `approved`.
 6. **Actions → Update prices → Run workflow.** It deploys daily after that.
 
+**Reddit review.** Every submitted post is screened before anything is imported:
+1. **Hard rules (code):** reddit.com links only, including after redirects; subreddit on the allowlist in `config/reddit.json`; posted within 30 days; author not deleted.
+2. **LLM review:** a genuine for-sale listing (not want-to-buy or trade), checked for scam signals such as gift-card or crypto-only payment, off-platform pressure, or implausibly cheap luxury bottles. The post is treated as untrusted text, so it can't instruct its way past the code-side rules.
+3. **Price sanity:** each item is compared with the site's current prices. Items under a third of the cheapest shop price are dropped, and if more than 30% of a post's items are, the post is rejected.
+
+Rejected posts get a `rejected` or `needs-review` label with the reason in a comment. A maintainer can add `override` to import anyway (the hard rules still apply). Only maintainers can add labels.
+
+**Security notes.** Actions are pinned to commit SHAs. Workflow tokens default to read-only, and each workflow asks only for what it needs. The Reddit job checks out code without persisting credentials and only gets a push token in its commit step. The issue body reaches the script as an environment variable, never interpolated into shell. The OpenRouter key exists only as an encrypted repo secret. The site renders scraped and Reddit text escaped, and only http(s) links.
+
 **Reddit submissions:** posts you submit are imported right away. Other people's submissions wait until you add the `approved` label, so strangers can't spend your API credit. The bot comments on the issue with what it extracted.
 
 ## Local
