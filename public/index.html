@@ -41,7 +41,9 @@
 <footer>
   <button class="linkish" data-reddit>+ Add a Reddit post</button>
   <span class="dot">·</span>
-  <span>Prices in USD, before shipping and tax. Always confirm on the store's page.</span>
+  <span>Prices in USD, before shipping and tax. Always confirm on the store's page. Listing a shop or Reddit seller isn't an endorsement.</span>
+  <span class="dot">·</span>
+  <a href="https://github.com/tucana1/scent-prices/issues/new?title=Removal%20or%20correction%20request" target="_blank" rel="noopener">Report a problem or ask to be removed</a>
 </footer>
 
 <dialog id="redditDlg">
@@ -56,7 +58,7 @@
     <label>Reddit post link <input name="url" type="url" required placeholder="https://www.reddit.com/r/fragranceswap/comments/…"></label>
     <label>Price list text <small>(optional. Only needed if the prices are in an image or spreadsheet)</small>
       <textarea name="text" rows="4"></textarea></label>
-    <p class="small">A bot replies on the GitHub issue with the prices it found. They show up here after the next site update.</p>
+    <p class="small">Posts are checked by a person and an AI before anything is added, so it can take a day or two. A bot replies on the GitHub issue with the result.</p>
     <div class="row"><button value="cancel" formnovalidate>Cancel</button><button value="ok" class="primary">Continue to GitHub</button></div>
   </form>
 </dialog>

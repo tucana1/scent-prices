@@ -289,7 +289,8 @@ async function showPerfume(id) {
       <span class="dim">${new Set(shown.map((o) => o.src)).size} decant shops ↓</span></a>` : ''}
     <h2 class="sec">Full bottles</h2>
     ${bottleHtml || '<p class="dim">No full bottles in stock at tracked shops right now.</p>'}
-    ${decantHtml}`;
+    ${decantHtml}
+    ${[...p.bottles, ...p.decants].some((o) => o.src === 'reddit') ? '<p class="dim small">Reddit sellers are individuals, not shops. Check their swap history and pay with PayPal Goods &amp; Services, never Friends &amp; Family, gift cards or crypto.</p>' : ''}`;
 }
 
 function concTabs(it) {

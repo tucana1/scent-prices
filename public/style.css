@@ -103,7 +103,7 @@ dialog h2 { margin: 0 0 6px; font-size: 18px; }
 dialog p { color: var(--dim); font-size: 14px; }
 dialog label { display: block; font-size: 14px; font-weight: 600; margin: 12px 0 0; }
 dialog input, dialog textarea { display: block; width: 100%; margin-top: 4px; padding: 9px 10px; font: inherit; font-weight: 400; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); }
-dialog .small { font-size: 12.5px; }
+dialog .small, .small { font-size: 12.5px; }
 dialog .row { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
 dialog button { font: inherit; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); cursor: pointer; }
 dialog button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
