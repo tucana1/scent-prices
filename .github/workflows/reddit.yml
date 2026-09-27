@@ -47,7 +47,7 @@ jobs:
           git add data/reddit.json
           git commit -m "Reddit prices from issue #${{ github.event.issue.number }}"
           git pull --rebase && git push
-          gh workflow run update.yml
+          gh workflow run update.yml -f scrape=false   # rebuild from the last scrape: live in ~2 min
         env: { GH_TOKEN: '${{ github.token }}' }
       - name: Report back on the issue
         if: always()
