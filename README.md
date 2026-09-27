@@ -61,6 +61,7 @@ Most shops are read from Shopify's public `/products.json` feed. Shops that aren
 | [Luckyscent](https://www.luckyscent.com) | bottles + samples | [Fragrantica thread](https://www.fragrantica.com/board/viewtopic.php?id=11261) · [Essencional profile](https://www.essencional.com/en/posts/luckyscent-americas-go-to-retailer-for-niche-perfumery/) |
 | [Aromatick](https://aromatick.com) | bottles + samples | [vouched by site owner](https://aromatick.com) |
 | [Rich and Luxe](https://www.richandluxe.com) | bottles + samples | [vouched by site owner](https://www.richandluxe.com) |
+| [Comedic Scents](https://comedicscents.myshopify.com) | bottles + samples | [vouched by site owner](https://comedicscents.myshopify.com) |
 | [MaxAroma](https://www.maxaroma.com) | discounter | — |
 | [Perfumania](https://perfumania.com) | discounter | — |
 | [Beauty Encounter](https://www.beautyencounter.com) | discounter | — |

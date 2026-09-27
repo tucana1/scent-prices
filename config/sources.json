@@ -575,6 +575,20 @@
           "url": "https://decantanddiscover.com"
         }
       ]
+    },
+    {
+      "id": "comedicscents",
+      "name": "Comedic Scents",
+      "kind": "mixed",
+      "adapter": "shopify",
+      "base": "https://comedicscents.myshopify.com",
+      "brandFrom": "title",
+      "vouch": [
+        {
+          "label": "vouched by site owner",
+          "url": "https://comedicscents.myshopify.com"
+        }
+      ]
     }
   ]
 }

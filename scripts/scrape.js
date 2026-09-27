@@ -92,7 +92,7 @@ function offersFromShopify(src, p, knownBrands) {
   if (!name) return out;
   // Vintage shops sell specific batches; keep that visible instead of silently merging.
   const batch = p.title.match(/\b((?:19|20)\d{2})'?s?\s+batch\b/i);
-  const note = batch ? `${batch[1]}${/'?s\s/i.test(batch[0]) ? 's' : ''} batch` : undefined;
+  const batchNote = batch ? `${batch[1]}${/'?s\s/i.test(batch[0]) ? 's' : ''} batch` : undefined;
 
   for (const v of p.variants || []) {
     if (!v.available) continue;
@@ -107,6 +107,9 @@ function offersFromShopify(src, p, knownBrands) {
     const kind = kindOf(src, ml, `${p.title} ${vt}`, inOriginalBottle);
     // A product can list EDT and EDP as variants, so the variant's own label wins.
     const conc = concentration(vt) || concentration(productText);
+    // Partially used bottles ("98/100ml") are worth flagging next to the price.
+    const partial = vt.match(/\b(\d+)\s*\/\s*(\d+)\s*ml\b/i);
+    const note = partial && +partial[2] > 4 ? `partial ${partial[1]}/${partial[2]} ml` : batchNote;
     out.push({
       id: perfumeId(brand, name, conc),
       brand, name, conc,

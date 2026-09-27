@@ -80,8 +80,9 @@ export function concentration(text) {
 
 export function sizeMl(text) {
   const t = String(text || '').toLowerCase().replace(/,(?=\d)/g, '.');
-  let m = t.match(/\b(\d+)\s*\/\s*(\d+)\s*ml\b/); // "1/2 ml" vials
-  if (m && +m[2]) return +(+m[1] / +m[2]).toFixed(2);
+  let m = t.match(/\b(\d+)\s*\/\s*(\d+)\s*ml\b/);
+  // "1/2 ml" is a half-ml vial; "98/100ml" is a partial bottle with 98 ml left.
+  if (m && +m[2]) return +m[2] <= 4 ? +(+m[1] / +m[2]).toFixed(2) : +m[1];
   m = t.match(/(\d+(?:\.\d+)?)\s*ml\b/);
   if (m) return +m[1];
   m = t.match(/(\d*\.?\d+)\s*(?:fl\.?\s*)?oz\b/);
@@ -155,6 +156,12 @@ export function sizeBucket(ml) {
 export function brandFromTitle(title, knownBrands) {
   const by = String(title).match(/\sby\s+(.+?)(?=\s+(?:eau|edp|edt|parfum|extrait|cologne|for|spray|perfume)\b|\s*[(\-–|,]|\s+\d|$)/i);
   if (by) return by[1].trim();
+  // "Ultra Male- Jean Paul Gaultier": a known house after a trailing dash.
+  const dash = String(title).match(/[-–]\s*([^-–]+?)\s*$/)?.[1];
+  if (dash) {
+    const hit = knownBrands.get(words(dash)) || knownBrands.get(words(canonicalBrand(dash)));
+    if (hit) return hit;
+  }
   const t = words(title).split(' ');
   for (let n = Math.min(5, t.length - 1); n >= 1; n--) {
     const hit = knownBrands.get(t.slice(0, n).join(' '));
