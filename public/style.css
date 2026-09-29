@@ -1,19 +1,23 @@
 :root {
-  --bg: #faf7f4; --panel: #ffffff; --ink: #1f1a17; --dim: #7a6f68; --line: #ebe4de;
-  --accent: #8a5a44; --accent-soft: #f3e9e3; --best: #eef6ee; --best-ink: #2f6b35; --warn: #a86a12;
+  --bg: #f8f8f6; --panel: #ffffff; --ink: #1b1d22; --dim: #6b6f78; --line: #e4e4df;
+  --accent: #2b4c7e; --accent-soft: #e7edf6; --on-accent: #ffffff;
+  --best: #ecf5ee; --best-ink: #256b3a; --warn: #9a5b12; --up: #a2382b;
   --radius: 10px; --reddit: #d9480f;
+  --serif: Georgia, "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #151312; --panel: #1d1a19; --ink: #eee8e3; --dim: #9d928a; --line: #2e2926;
-    --accent: #d09a7e; --accent-soft: #2c221d; --best: #1c2a1d; --best-ink: #8fd097; --warn: #e0a654;
+    --bg: #121418; --panel: #1a1d23; --ink: #e8eaee; --dim: #99a0ab; --line: #2a2e36;
+    --accent: #8fb1e3; --accent-soft: #1c2636; --on-accent: #0f1622;
+    --best: #16261b; --best-ink: #86d49b; --warn: #e0a654; --up: #f08a7c;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #151312; --panel: #1d1a19; --ink: #eee8e3; --dim: #9d928a; --line: #2e2926;
-  --accent: #d09a7e; --accent-soft: #2c221d; --best: #1c2a1d; --best-ink: #8fd097; --warn: #e0a654;
+  --bg: #121418; --panel: #1a1d23; --ink: #e8eaee; --dim: #99a0ab; --line: #2a2e36;
+  --accent: #8fb1e3; --accent-soft: #1c2636; --on-accent: #0f1622;
+  --best: #16261b; --best-ink: #86d49b; --warn: #e0a654; --up: #f08a7c;
   color-scheme: dark;
 }
 
@@ -34,7 +38,7 @@ a { color: inherit; }
 .reddit-card { margin-top: 22px; padding: 16px 18px; border-radius: var(--radius); border: 1px solid var(--line); border-left: 4px solid var(--reddit); background: var(--panel); color: var(--ink); }
 .reddit-card h2 { margin: 0 0 4px; font-size: 16px; }
 .reddit-card p { margin: 0 0 12px; color: var(--dim); font-size: 14px; }
-button.primary { font: inherit; font-weight: 600; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; }
+button.primary { font: inherit; font-weight: 600; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--accent); background: var(--accent); color: var(--on-accent); cursor: pointer; }
 .reddit-inline { font-size: 13.5px; margin-top: 8px; }
 .steps { margin: 4px 0 4px; padding-left: 20px; font-size: 14px; color: var(--ink); }
 .steps li { margin: 2px 0; }
@@ -106,7 +110,7 @@ dialog input, dialog textarea { display: block; width: 100%; margin-top: 4px; pa
 dialog .small, .small { font-size: 12.5px; }
 dialog .row { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
 dialog button { font: inherit; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); cursor: pointer; }
-dialog button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+dialog button.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 
 @media (max-width: 520px) {
   td.num.dim { display: none; }
@@ -138,7 +142,7 @@ dialog button.primary { background: var(--accent); border-color: var(--accent); 
 .sizes.inline { margin: 0 0 10px; }
 .chip { font: inherit; font-size: 13px; padding: 4px 10px; border-radius: 99px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
 .chip:hover:not(:disabled) { border-color: var(--accent); }
-.chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.chip.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 .chip:disabled { opacity: .4; cursor: default; }
 .vouch { font-size: 12px; margin-right: auto; }
 .shops li a.vouch-link, .vouch a { color: var(--dim); font-weight: 500; text-decoration: underline; text-underline-offset: 2px; }
@@ -148,3 +152,82 @@ dialog button.primary { background: var(--accent); border-color: var(--accent); 
 .conc-tabs .chip { text-decoration: none; }
 .conc-tabs .chip small { opacity: .75; margin-left: 2px; }
 .conc-tabs .chip.on small { opacity: .9; }
+
+/* Serif display type (seed apnj16y13x4nr4o7): headings and the wordmark; UI and numbers stay sans. */
+.logo, .pitch, .detail h1, .popular-head h2, .reddit-card h2, dialog h2, .letter-group h2 { font-family: var(--serif); font-weight: 700; letter-spacing: 0; }
+.logo { font-size: 21px; }
+.pitch { font-size: 26px; line-height: 1.2; }
+.detail h1 { font-size: 30px; }
+.detail h1 .br { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 16px; text-decoration: none; }
+.detail h1 a.br:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.results li a { padding: 12px 12px; }
+
+.toprow { flex-wrap: wrap; row-gap: 6px; }
+.nav { display: flex; align-items: center; gap: 4px; font-size: 14px; }
+.nav a { text-decoration: none; padding: 5px 10px; border-radius: 99px; color: var(--ink); font-weight: 500; }
+.nav a:hover { background: var(--accent-soft); }
+.nav a.on { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.nav .reddit-btn { margin-left: 6px; }
+.count:not(:empty) { display: inline-block; min-width: 18px; padding: 0 5px; margin-left: 2px; border-radius: 99px; background: var(--accent); color: var(--on-accent); font-size: 11px; font-weight: 700; text-align: center; line-height: 18px; }
+.search { position: relative; }
+.slash { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--dim); border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; pointer-events: none; }
+.search input:focus + .slash, .search input:not(:placeholder-shown) + .slash { display: none; }
+@media (hover: none) { .slash { display: none; } }
+.search input::-webkit-search-cancel-button { cursor: pointer; }
+
+.title-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.actions { display: flex; gap: 6px; margin-top: 14px; }
+.act { font: inherit; font-size: 13px; font-weight: 600; padding: 5px 12px; border-radius: 99px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+.act:hover { border-color: var(--accent); }
+.act.on { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+
+.brand-hit a { background: var(--accent-soft); margin-bottom: 4px; }
+.brand-hit .nm b { color: var(--accent); }
+.filter { width: 100%; font: inherit; padding: 9px 12px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--panel); color: var(--ink); margin: 6px 0 10px; }
+.letters { display: flex; flex-wrap: wrap; gap: 2px; margin-bottom: 8px; position: sticky; top: 0; }
+.letters a { text-decoration: none; color: var(--accent); font-weight: 600; font-size: 13px; padding: 3px 7px; border-radius: 6px; }
+.letters a:hover { background: var(--accent-soft); }
+.letter-group h2 { font-size: 20px; margin: 18px 0 6px; border-bottom: 1px solid var(--line); padding-bottom: 4px; }
+.brand-grid { list-style: none; margin: 0; padding: 0; columns: 3 200px; column-gap: 20px; }
+.brand-grid li { break-inside: avoid; padding: 3px 0; font-size: 14.5px; }
+.brand-grid a { text-decoration: none; }
+.brand-grid a:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+.brand-grid small { margin-left: 3px; }
+
+.deals { list-style: none; margin: 0; padding: 0; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
+.deal { display: grid; grid-template-columns: 1fr auto auto; gap: 4px 14px; align-items: center; padding: 10px 12px; border-top: 1px solid var(--line); }
+.deal:first-child { border-top: 0; }
+.deal .nm { text-decoration: none; min-width: 0; }
+.deal .nm:hover b { color: var(--accent); }
+.deal .sub { display: block; }
+.deal .px { font-variant-numeric: tabular-nums; }
+.deal .px b { color: var(--best-ink); }
+.off { display: inline-block; margin-left: 4px; font-size: 12px; font-weight: 700; color: var(--best-ink); background: var(--best); border-radius: 99px; padding: 1px 7px; }
+.deal .go { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 14px; }
+@media (max-width: 520px) {
+  .deal { grid-template-columns: 1fr auto; }
+  .deal .go { grid-column: 2; }
+  .deal .px { grid-column: 1; grid-row: 2; justify-self: start; }
+  .nav { width: 100%; }
+  .nav .reddit-btn { margin-left: auto; }
+  .detail h1 { font-size: 24px; }
+}
+
+.since { display: block; font-size: 12.5px; margin-top: 2px; }
+.down { color: var(--best-ink); font-weight: 600; }
+.up { color: var(--up); font-weight: 600; }
+.plan-form { display: flex; flex-wrap: wrap; gap: 10px 18px; margin: 8px 0; font-size: 14px; }
+.plan-form label { display: flex; align-items: center; gap: 6px; font-weight: 600; }
+.plan-form select, .plan-form input { font: inherit; font-weight: 400; padding: 5px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
+.plan-form input { width: 70px; }
+.plan-pick { list-style: none; margin: 0 0 12px; padding: 0; columns: 2 240px; font-size: 14px; }
+.plan-pick li { break-inside: avoid; padding: 2px 0; }
+.plan-pick input { accent-color: var(--accent); margin-right: 4px; }
+.plan-total { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 14px; border-radius: var(--radius); background: var(--best); color: var(--best-ink); font-size: 15px; }
+.plan-total b { font-size: 20px; }
+#planOut .size td a { text-decoration: none; font-weight: 600; }
+#planOut .size td a:hover { color: var(--accent); }
+footer .linkish { font-weight: 500; }
+.loading { color: var(--dim); }
+/* On phones the header (nav + search + size chips) is too tall to pin; let it scroll away. */
+@media (max-width: 520px) { .top { position: static; } }

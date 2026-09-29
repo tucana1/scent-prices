@@ -186,6 +186,33 @@ for (const key of Object.keys(history)) {
   histKeys.get(id).push(key);
 }
 
+// --- Deals: a shop's listing now priced well under its highest price in the last 30 days -------
+// Tracked per listing (shop + URL + size), so a newly added shop or a partial bottle showing up
+// isn't mistaken for a price cut. Lives in the build cache, not git: it's only needed for this.
+const listingPrices = await readJson('build/listing-prices.json', {});
+const seenListings = new Set();
+const deals = new Map(); // perfume id -> its biggest deal
+function dealFor(id, o) {
+  const key = `${o.src}|${o.url}|${o.ml}`;
+  seenListings.add(key);
+  const series = (listingPrices[key] ||= []);
+  const last = series[series.length - 1];
+  if (last && last[0] === today) last[1] = o.price;
+  else if (!last || last[1] !== o.price) series.push([today, o.price]);
+  // Keep 30 days, plus the point that was in effect when the window opened.
+  while (series.length > 1 && series[1][0] <= today - 30) series.shift();
+  if (series.length < 2) return;
+  const now = o.price;
+  let was = 0;
+  // Only prices that held for 2+ days count as "was": a one-day blip is usually a pricing glitch.
+  for (let i = 0; i < series.length - 1; i++) if (series[i + 1][0] - series[i][0] >= 2) was = Math.max(was, series[i][1]);
+  const drop = was ? (was - now) / was : 0;
+  // Drops over 70% are almost always a pricing mistake or a listing that changed what it sells.
+  if (drop < 0.1 || drop > 0.7) return;
+  const prev = deals.get(id);
+  if (!prev || drop > prev.drop) deals.set(id, { id, src: o.src, kind: o.kind, ml: o.ml, url: o.url, was, now, drop });
+}
+
 // --- Write outputs ----------------------------------------------------------------------------
 const titleCase = (s) => s.replace(/\b[a-z]/g, (c) => c.toUpperCase());
 const brands = [];
@@ -213,6 +240,8 @@ for (const [id, p] of perfumes) {
   for (const [s, price] of lowBySize) record(`${id}|${s}`, price);
   const shopDecants = decants.filter((o) => o.src !== 'reddit');
   if (shopDecants.length) record(`${id}|d`, +(shopDecants[0].price / shopDecants[0].ml).toFixed(2));
+
+  for (const o of offers) if (o.src !== 'reddit' && !o.tester) dealFor(id, o);
 
   const hist = {};
   for (const key of histKeys.get(id) || []) hist[key.slice(id.length + 1)] = history[key];
@@ -262,6 +291,14 @@ const srcMeta = Object.fromEntries(listed.map((s) => [s.id, {
 }]));
 srcMeta.reddit = { name: 'Reddit', kind: 'reddit' };
 await writeFile(new URL('index.json', out), JSON.stringify({ updated: scraped.scrapedAt || new Date().toISOString(), sources: srcMeta, brands, rows }));
+// Deals page: biggest cuts, weighted towards fragrances more shops carry (fewer one-off listings).
+for (const key of Object.keys(listingPrices)) if (!seenListings.has(key)) delete listingPrices[key];
+await writeFile(new URL('build/listing-prices.json', root), JSON.stringify(listingPrices));
+const nShopsOf = (id) => new Set([...perfumes.get(id).offers.values()].map((o) => o.src)).size;
+const dealList = [...deals.values()].map((d) => ({ ...d, score: d.drop * Math.log2(1 + nShopsOf(d.id)) })).sort((a, b) => b.score - a.score);
+await writeFile(new URL('deals.json', out), JSON.stringify({ updated: scraped.scrapedAt || new Date().toISOString(),
+  deals: dealList.slice(0, 400).map(({ id, src, kind, ml, url, was, now }) => ({ id, src, kind, ml, url, was, now })) }));
+console.log(`deals: ${deals.size} fragrances with a listing at least 10% under its 30-day high`);
 await Promise.all(shards.map((s, i) => writeFile(new URL(`p/${i.toString(16).padStart(2, '0')}.json`, out), JSON.stringify(s))));
 // One sorted line per series: daily commits then diff (and git-compress) as a few changed lines.
 const histLines = Object.keys(history).sort().map((k) => `${JSON.stringify(k)}:${JSON.stringify(history[k])}`);

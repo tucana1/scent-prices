@@ -6,6 +6,16 @@ Search any fragrance and compare decant prices across every tracked decant shop,
 
 **Top 1,000:** `#/popular` ranks fragrances by how many tracked shops stock them, a stand-in for popularity since there's no open popularity dataset. The build log reports coverage, for example "top 1000: 993 have decants, 876 have 3+ decant shops".
 
+**Deals:** `#/deals` lists shop listings now at least 10% under their own highest price of the last 30 days (same shop, URL and size, so a newly added shop or a partial bottle isn't a "drop"). Prices that lasted under 2 days don't count as the old price, and cuts over 70% are dropped as likely mistakes. Each listing's price series lives in the Actions cache (`build/listing-prices.json`), not in git.
+
+**Brands:** `#/brands` is an A–Z list with a filter; `#/b/<brand>` lists a house's fragrances. Searching a brand name puts a link to its page at the top of the results.
+
+**Saved and order planner:** "☆ Save" on a fragrance keeps it in the browser (localStorage, nothing leaves the device). `#/saved` shows how each one's lowest price moved since saving, and plans an order: for a chosen decant size and a per-shop shipping estimate, it picks the set of shops (exact search up to 4 shops) with the lowest total, so it won't split an order five ways to save a dollar. Reddit sellers are left out of plans.
+
+**Also:** a light/dark/auto theme switch in the footer, a Share button (native share sheet or copy link), and keyboard use: `/` focuses search, arrow keys move through results, Escape clears.
+
+**Design:** ink-blue accent with serif headings, picked from the random seed `apnj16y13x4nr4o7` (its characters indexed a list of palettes, type pairings and a build order for these features).
+
 ## How it works
 
 ```
@@ -14,6 +24,7 @@ GitHub Actions (daily, free)                     GitHub Pages (free, static)
 │ scrape.js  → shops' feeds   │                  │ index.html + app.js      │
 │ build.js   → merge + match  │ ── deploy ──▶    │ data/index.json  (175KB gz) search index
 │            → history.json   │                  │ data/p/00..ff.json       offers + history, on demand
+│            → deals.json     │                  │ data/deals.json          biggest price cuts
 └─────────────────────────────┘                  └──────────────────────────┘
         ▲ commit data/reddit.json
 ┌─────────────────────────────┐

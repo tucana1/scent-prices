@@ -6,16 +6,29 @@
 <title>Scent Prices · Decant Price Comparison</title>
 <meta name="description" content="Compare decant and sample prices for any fragrance across dozens of decant shops and Reddit splits, plus full-bottle discounters. No affiliate links.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='9' y='10' width='14' height='18' rx='3' fill='%23000000'/><rect x='13' y='4' width='6' height='6' rx='1' fill='%23000000'/></svg>">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Scent Prices · Decant Price Comparison">
+<meta property="og:description" content="Every decant shop's price for a fragrance, side by side, plus Reddit splits and full-bottle discounters. Updated daily, no affiliate links.">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#f8f8f6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121418" media="(prefers-color-scheme: dark)">
+<script>try { const t = JSON.parse(localStorage.getItem('theme')); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch {}</script>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header class="top">
   <div class="toprow">
     <a href="#" class="logo">Scent<span>Prices</span> <small class="tagline">decant price comparison</small></a>
-    <button class="reddit-btn" data-reddit title="Submit a Reddit sale or decant post">+ Add a Reddit post</button>
+    <nav class="nav">
+      <a href="#/deals">Deals</a>
+      <a href="#/brands">Brands</a>
+      <a href="#/saved">Saved <span id="savedN" class="count"></span></a>
+      <button class="reddit-btn" data-reddit title="Submit a Reddit sale or decant post">+ Reddit post</button>
+    </nav>
   </div>
   <div class="search">
-    <input id="q" type="search" placeholder="Search a fragrance to compare decants — e.g. aventus, baccarat rouge, khamrah" autocomplete="off" autofocus>
+    <input id="q" type="search" placeholder="Search a fragrance to compare decants — e.g. aventus, baccarat rouge, khamrah" autocomplete="off" autofocus aria-label="Search fragrances">
+    <kbd class="slash" title="Press / to search">/</kbd>
   </div>
   <div class="sizes" id="sizes"></div>
   <p class="meta" id="meta">Loading index…</p>
@@ -44,6 +57,10 @@
   <span>Prices in USD, before shipping and tax. Always confirm on the store's page. Listing a shop or Reddit seller isn't an endorsement.</span>
   <span class="dot">·</span>
   <a href="https://github.com/tucana1/scent-prices/issues/new?title=Removal%20or%20correction%20request" target="_blank" rel="noopener">Report a problem or ask to be removed</a>
+  <span class="dot">·</span>
+  <a href="https://github.com/tucana1/scent-prices" target="_blank" rel="noopener">Open source</a>
+  <span class="dot">·</span>
+  <button id="theme" class="linkish"></button>
 </footer>
 
 <dialog id="redditDlg">
