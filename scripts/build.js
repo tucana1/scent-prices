@@ -17,6 +17,11 @@ const today = Math.floor(Date.now() / 86400000); // days since epoch
 
 const { sources } = await readJson('config/sources.json');
 const scraped = await readJson('build/offers.json', { offers: [] });
+// A missing or truncated scrape would otherwise deploy a near-empty site: stop instead.
+if (scraped.offers.length < 20000 && !process.env.ALLOW_SMALL_BUILD) {
+  console.error(`only ${scraped.offers.length} scraped offers (build/offers.json missing or truncated?); set ALLOW_SMALL_BUILD=1 to build anyway`);
+  process.exit(1);
+}
 const reddit = await readJson('data/reddit.json', { posts: [] });
 const history = await readJson('data/history.json', {});
 // Migrate history keys from before ids ignored spacing in names ("dior--sauvage-elixir--edp|60"
@@ -293,6 +298,7 @@ srcMeta.reddit = { name: 'Reddit', kind: 'reddit' };
 await writeFile(new URL('index.json', out), JSON.stringify({ updated: scraped.scrapedAt || new Date().toISOString(), sources: srcMeta, brands, rows }));
 // Deals page: biggest cuts, weighted towards fragrances more shops carry (fewer one-off listings).
 for (const key of Object.keys(listingPrices)) if (!seenListings.has(key)) delete listingPrices[key];
+await mkdir(new URL('build/', root), { recursive: true });
 await writeFile(new URL('build/listing-prices.json', root), JSON.stringify(listingPrices));
 const nShopsOf = (id) => new Set([...perfumes.get(id).offers.values()].map((o) => o.src)).size;
 const dealList = [...deals.values()].map((d) => ({ ...d, score: d.drop * Math.log2(1 + nShopsOf(d.id)) })).sort((a, b) => b.score - a.score);

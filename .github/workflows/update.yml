@@ -34,16 +34,21 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with: { node-version: 22 }
       # Yesterday's offers stand in for any shop that fails today (see STALE_DAYS in scrape.js).
-      # MaxAroma's rotating crawl also needs to remember which pages it checked when, and the
-      # Deals page needs each listing's price over the last 30 days.
+      # MaxAroma's rotating crawl also needs to remember which pages it checked when.
+      # (Changing this path list changes the cache's identity and loses the saved offers.)
       - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: |
             build/offers.json
             build/jsonld-state.json
-            build/listing-prices.json
           key: offers-${{ github.run_id }}
           restore-keys: offers-
+      # Each shop listing's price over the last 30 days, for the Deals page.
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: build/listing-prices.json
+          key: listing-prices-${{ github.run_id }}
+          restore-keys: listing-prices-
       - run: node scripts/scrape.js 2>&1 | tee scrape.log
         if: github.event_name == 'schedule' || inputs.scrape
       - run: node scripts/build.js
